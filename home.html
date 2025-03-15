@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>安全流程设计器</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .nav-item.active {
+            color: #2563eb;
+            border-bottom: 2px solid #2563eb;
+        }
+        .subnav-item.active {
+            color: #2563eb;
+            background-color: #eff6ff;
+        }
+    </style>
+</head>
+<body class="h-screen flex flex-col">
+    <!-- 顶部导航栏 -->
+    <nav class="bg-white border-b px-6 py-4 flex justify-between items-center">
+        <div class="flex space-x-8">
+            <a href="#" class="nav-item active px-2 py-1" onclick="switchNav('business')">业务中心</a>
+            <a href="#" class="nav-item px-2 py-1" onclick="switchNav('risk')">风险研判</a>
+            <a href="#" class="nav-item px-2 py-1" onclick="switchNav('asset')">资产汇聚</a>
+            <a href="#" class="nav-item px-2 py-1" onclick="switchNav('intelligence')">情报库</a>
+            <a href="#" class="nav-item px-2 py-1" onclick="switchNav('support')">支撑单位管理</a>
+        </div>
+        <div class="relative">
+            <button class="flex items-center space-x-3 hover:bg-gray-50 rounded-lg px-3 py-2" onclick="toggleUserDropdown()">
+                <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                    alt="用户头像"
+                    class="h-8 w-8 rounded-full">
+                <span class="text-gray-700">admin</span>
+                <i class="fas fa-chevron-down text-gray-400"></i>
+            </button>
+            <div id="userDropdown" class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg hidden z-50">
+                <div class="py-1">
+                    <a href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                        <i class="fas fa-user mr-3 w-4 text-gray-400"></i>
+                        账户信息
+                    </a>
+                    <a href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                        <i class="fas fa-key mr-3 w-4 text-gray-400"></i>
+                        修改密码
+                    </a>
+                    <div class="border-t border-gray-100"></div>
+                    <a href="#" class="flex items-center px-4 py-2 text-sm text-red-600 hover:bg-gray-100">
+                        <i class="fas fa-sign-out-alt mr-3 w-4"></i>
+                        退出登录
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主要内容区域 -->
+    <div class="flex-1 flex">
+        <!-- 左侧导航栏 -->
+        <aside class="w-48 bg-white border-r">
+            <!-- 业务中心子菜单 -->
+            <div id="business-menu" class="py-4">
+                <a href="#" class="subnav-item active block px-6 py-2" onclick="loadPage('risk-warning')">风险预警</a>
+                <a href="#" class="subnav-item block px-6 py-2" onclick="loadPage('info-notification')">信息通报</a>
+                <a href="#" class="subnav-item block px-6 py-2" onclick="loadPage('self-report')">自主上报</a>
+                <a href="#" class="subnav-item block px-6 py-2" onclick="loadPage('emergency-handle')">应急处置</a>
+                <a href="#" class="subnav-item block px-6 py-2" onclick="loadPage('plan-management')">预案管理</a>
+                <a href="#" class="subnav-item block px-6 py-2" onclick="loadPage('collaborative-handle')">协同处置</a>
+                <a href="#" class="subnav-item block px-6 py-2" onclick="loadPage('incident-report')">事件上报</a>
+            </div>
+            <!-- 风险研判子菜单 -->
+            <div id="risk-menu" class="py-4 hidden">
+                <a href="#" class="subnav-item block px-6 py-2" onclick="loadPage('risk-analysis')">研判分析</a>
+            </div>
+            <!-- 资产汇聚子菜单 -->
+            <div id="asset-menu" class="py-4 hidden">
+                <a href="#" class="subnav-item block px-6 py-2" onclick="loadPage('asset-search')">资产搜索</a>
+            </div>
+            <!-- 情报库子菜单 -->
+            <div id="intelligence-menu" class="py-4 hidden">
+                <a href="#" class="subnav-item block px-6 py-2" onclick="loadPage('intelligence-search')">情报检索</a>
+                <a href="#" class="subnav-item block px-6 py-2" onclick="loadPage('intelligence-statistics')">情报统计</a>
+                <a href="#" class="subnav-item block px-6 py-2" onclick="loadPage('threat-intelligence')">威胁情报</a>
+                <a href="#" class="subnav-item block px-6 py-2" onclick="loadPage('feature-intelligence')">特征情报</a>
+                <a href="#" class="subnav-item block px-6 py-2" onclick="loadPage('intelligence-knowledge')">情报知识库</a>
+            </div>
+            <!-- 支撑单位管理子菜单 -->
+            <div id="support-menu" class="py-4 hidden">
+                <a href="#" class="subnav-item block px-6 py-2" onclick="loadPage('unit-management')">单位管理</a>
+                <a href="#" class="subnav-item block px-6 py-2" onclick="loadPage('unit-assessment')">单位考核</a>
+                <a href="#" class="subnav-item block px-6 py-2" onclick="loadPage('assessment-rules')">考核规则</a>
+            </div>
+        </aside>
+
+        <!-- 内容区域 -->
+        <main class="flex-1 p-6">
+            <iframe id="content-frame" class="w-full h-full border-none" src="pages/risk-warning.html"></iframe>
+        </main>
+    </div>
+
+    <script>
+        // 切换顶部导航
+        function switchNav(nav) {
+            // 更新顶部导航样式
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // 隐藏所有子菜单
+            document.querySelectorAll('[id$="-menu"]').forEach(menu => {
+                menu.classList.add('hidden');
+            });
+
+            // 显示对应的子菜单
+            document.getElementById(nav + '-menu').classList.remove('hidden');
+
+            // 加载默认页面
+            const defaultPages = {
+                'business': 'risk-warning',
+                'risk': 'risk-analysis',
+                'asset': 'asset-search',
+                'intelligence': 'intelligence-search',
+                'support': 'unit-management'
+            };
+            loadPage(defaultPages[nav]);
+        }
+
+        // 加载页面内容
+        function loadPage(page) {
+            // 更新子菜单样式
+            document.querySelectorAll('.subnav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // 加载对应页面
+            document.getElementById('content-frame').src = `pages/${page}.html`;
+        }
+
+        // 用户下拉菜单切换
+        function toggleUserDropdown() {
+            const dropdown = document.getElementById('userDropdown');
+            dropdown.classList.toggle('hidden');
+        }
+
+        // 点击其他地方关闭下拉菜单
+        document.addEventListener('click', (e) => {
+            const dropdown = document.getElementById('userDropdown');
+            const button = e.target.closest('button[onclick="toggleUserDropdown()"]');
+            
+            if (!button) {
+                dropdown.classList.add('hidden');
+            }
+        });
+    </script>
+</body>
+</html> 
