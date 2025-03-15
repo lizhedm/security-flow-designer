@@ -1,0 +1,1004 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>流程编排</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="../assets/js/x6.css" rel="stylesheet">
+    <script src="../assets/js/x6.js"></script>
+    <style>
+        #flow-canvas {
+            width: 100%;
+            height: 100%;
+            background-color: #f8fafc;
+            background-image: linear-gradient(#e2e8f0 1px, transparent 1px),
+                            linear-gradient(90deg, #e2e8f0 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        .node-selected {
+            filter: drop-shadow(0 0 6px rgba(37, 99, 235, 0.5));
+        }
+    </style>
+</head>
+<body class="bg-white h-screen flex flex-col">
+    <!-- 工具栏 -->
+    <div class="bg-white border-b p-4 flex items-center justify-between">
+        <div class="flex items-center space-x-4">
+            <button class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                <i class="fas fa-play mr-2"></i>发布运行
+            </button>
+            <button class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                <i class="fas fa-bookmark mr-2"></i>暂存当前版本
+            </button>
+            <button class="px-4 py-2 border rounded-lg hover:bg-gray-50">
+                <i class="fas fa-save mr-2"></i>保存为新版本
+            </button>
+            <button class="px-4 py-2 border rounded-lg hover:bg-gray-50">
+                <i class="fas fa-undo mr-2"></i>撤销
+            </button>
+            <button class="px-4 py-2 border rounded-lg hover:bg-gray-50">
+                <i class="fas fa-redo mr-2"></i>重做
+            </button>
+            <div class="border-l h-6 mx-2"></div>
+            <button class="px-4 py-2 border rounded-lg hover:bg-gray-50">
+                <i class="fas fa-bug mr-2"></i>调试
+            </button>
+            <button class="px-4 py-2 border rounded-lg hover:bg-gray-50">
+                <i class="fas fa-times mr-2"></i>取消编辑
+            </button>
+        </div>
+        <div class="flex items-center space-x-4">
+            <span class="text-gray-600">版本：1.0</span>
+            <div class="relative">
+                <button class="px-4 py-2 text-blue-600 hover:bg-blue-50 rounded-lg flex items-center" onclick="toggleVersionDropdown()">
+                    <i class="fas fa-history mr-2"></i>历史版本
+                    <i class="fas fa-chevron-down ml-2"></i>
+                </button>
+                <div id="versionDropdown" class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg hidden">
+                    <div class="py-1">
+                        <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">V1.2</a>
+                        <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">V1.1</a>
+                        <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">V1.0</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 主要内容区 -->
+    <div class="flex-1 flex">
+        <!-- 左侧组件面板 -->
+        <div class="w-64 border-r bg-white p-4">
+            <h3 class="font-medium mb-4">组件库</h3>
+            <div class="space-y-4">
+                <h4 class="text-sm font-medium text-gray-500 mb-2">基础组件</h4>
+                <div class="border rounded-lg p-3 cursor-move hover:shadow-md">
+                    <div class="flex items-center">
+                        <i class="fas fa-file-import text-gray-600 mr-3"></i>
+                        <span>数据输入</span>
+                    </div>
+                </div>
+                <div class="border rounded-lg p-3 cursor-move hover:shadow-md">
+                    <div class="flex items-center">
+                        <i class="fas fa-shield-alt text-blue-600 mr-3"></i>
+                        <span>漏洞扫描</span>
+                    </div>
+                </div>
+                <div class="border rounded-lg p-3 cursor-move hover:shadow-md">
+                    <div class="flex items-center">
+                        <i class="fas fa-bug text-red-600 mr-3"></i>
+                        <span>漏洞验证</span>
+                    </div>
+                </div>
+                <div class="border rounded-lg p-3 cursor-move hover:shadow-md">
+                    <div class="flex items-center">
+                        <i class="fas fa-chart-line text-green-600 mr-3"></i>
+                        <span>风险评估</span>
+                    </div>
+                </div>
+                <div class="border rounded-lg p-3 cursor-move hover:shadow-md">
+                    <div class="flex items-center">
+                        <i class="fas fa-tasks text-purple-600 mr-3"></i>
+                        <span>工单生成</span>
+                    </div>
+                </div>
+                <div class="border rounded-lg p-3 cursor-move hover:shadow-md">
+                    <div class="flex items-center">
+                        <i class="fas fa-tools text-orange-600 mr-3"></i>
+                        <span>处置措施</span>
+                    </div>
+                </div>
+
+                <h4 class="text-sm font-medium text-gray-500 mt-6 mb-2">逻辑组件</h4>
+                <div class="border rounded-lg p-3 cursor-move hover:shadow-md">
+                    <div class="flex items-center">
+                        <i class="fas fa-code-branch text-yellow-600 mr-3"></i>
+                        <span>条件判断(IF-ELSE)</span>
+                    </div>
+                </div>
+                <div class="border rounded-lg p-3 cursor-move hover:shadow-md">
+                    <div class="flex items-center">
+                        <i class="fas fa-sync text-yellow-600 mr-3"></i>
+                        <span>循环(LOOP)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 中间画布区域 -->
+        <div class="flex-1 relative">
+            <div id="flow-canvas"></div>
+        </div>
+
+        <!-- 右侧属性面板 -->
+        <div class="w-80 border-l bg-white p-4">
+            <h3 class="font-medium mb-4">属性配置</h3>
+            <div id="nodeConfig" class="space-y-4">
+                <!-- 默认显示空配置 -->
+                <div class="text-gray-500 text-center py-8">
+                    请选择一个节点进行配置
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 初始化画布
+        const graph = new X6.Graph({
+            container: document.getElementById('flow-canvas'),
+            grid: true,
+            mousewheel: {
+                enabled: true,
+                zoomAtMousePosition: true,
+                modifiers: 'ctrl',
+                minScale: 0.5,
+                maxScale: 2,
+            },
+            connecting: {
+                router: 'manhattan',
+                connector: {
+                    name: 'rounded',
+                    args: {
+                        radius: 8
+                    }
+                },
+                anchor: 'center',
+                connectionPoint: 'boundary',
+                allowBlank: false,
+                snap: true,
+                createEdge() {
+                    return new X6.Edge({
+                        attrs: {
+                            line: {
+                                stroke: '#5F95FF',
+                                strokeWidth: 1,
+                                targetMarker: {
+                                    name: 'classic',
+                                    size: 8,
+                                },
+                            },
+                        },
+                    })
+                },
+            },
+        });
+
+        // 注册自定义节点
+        X6.Graph.registerNode('flow-node', {
+            inherit: 'rect',
+            width: 180,
+            height: 40,
+            attrs: {
+                body: {
+                    stroke: '#5F95FF',
+                    strokeWidth: 1,
+                    fill: '#ffffff',
+                    rx: 6,
+                    ry: 6,
+                    transition: 'all 0.2s',
+                },
+                label: {
+                    fontSize: 14,
+                    fill: '#333333',
+                    textWrap: {
+                        width: -10,
+                        height: -10,
+                        ellipsis: true,
+                    },
+                },
+            },
+            ports: {
+                groups: {
+                    top: {
+                        position: 'top',
+                        attrs: {
+                            circle: {
+                                r: 4,
+                                magnet: true,
+                                stroke: '#5F95FF',
+                                strokeWidth: 1,
+                                fill: '#fff',
+                            },
+                        },
+                    },
+                    bottom: {
+                        position: 'bottom',
+                        attrs: {
+                            circle: {
+                                r: 4,
+                                magnet: true,
+                                stroke: '#5F95FF',
+                                strokeWidth: 1,
+                                fill: '#fff',
+                            },
+                        },
+                    },
+                },
+            },
+        });
+
+        // 创建流程节点
+        const nodes = [
+            {
+                id: 'node1',
+                shape: 'flow-node',
+                label: '数据输入',
+                position: { x: 300, y: 50 },
+                attrs: {
+                    body: {
+                        stroke: '#666666',
+                        fill: '#f9fafb',
+                    },
+                    label: {
+                        text: '数据输入',
+                    }
+                }
+            },
+            {
+                id: 'node2',
+                shape: 'flow-node',
+                label: '漏洞扫描(APTP)',
+                position: { x: 300, y: 150 },
+                attrs: {
+                    body: {
+                        stroke: '#3b82f6',
+                        fill: '#eff6ff',
+                    },
+                    label: {
+                        text: '漏洞扫描(APTP)',
+                    }
+                }
+            },
+            {
+                id: 'node3',
+                shape: 'flow-node',
+                label: '漏洞验证(APTP)',
+                position: { x: 300, y: 250 },
+                attrs: {
+                    body: {
+                        stroke: '#dc2626',
+                        fill: '#fef2f2',
+                    },
+                    label: {
+                        text: '漏洞验证(APTP)',
+                    }
+                }
+            },
+            {
+                id: 'node4',
+                shape: 'flow-node',
+                label: '条件判断(漏洞是否存在)',
+                position: { x: 300, y: 350 },
+                attrs: {
+                    body: {
+                        stroke: '#eab308',
+                        fill: '#fefce8',
+                    },
+                    label: {
+                        text: '条件判断(漏洞是否存在)',
+                    }
+                }
+            },
+            {
+                id: 'node5',
+                shape: 'flow-node',
+                label: '标记为有效风险',
+                position: { x: 100, y: 450 },
+                attrs: {
+                    body: {
+                        stroke: '#16a34a',
+                        fill: '#f0fdf4',
+                    },
+                    label: {
+                        text: '标记为有效风险',
+                    }
+                }
+            },
+            {
+                id: 'node6',
+                shape: 'flow-node',
+                label: '标记为误报',
+                position: { x: 300, y: 450 },
+                attrs: {
+                    body: {
+                        stroke: '#16a34a',
+                        fill: '#f0fdf4',
+                    },
+                    label: {
+                        text: '标记为误报',
+                    }
+                }
+            },
+            {
+                id: 'node7',
+                shape: 'flow-node',
+                label: '忽略',
+                position: { x: 500, y: 450 },
+                attrs: {
+                    body: {
+                        stroke: '#16a34a',
+                        fill: '#f0fdf4',
+                    },
+                    label: {
+                        text: '忽略',
+                    }
+                }
+            },
+            {
+                id: 'node8',
+                shape: 'flow-node',
+                label: '生成工单',
+                position: { x: 300, y: 550 },
+                attrs: {
+                    body: {
+                        stroke: '#9333ea',
+                        fill: '#faf5ff',
+                    },
+                    label: {
+                        text: '生成工单',
+                    }
+                }
+            },
+            {
+                id: 'node9',
+                shape: 'flow-node',
+                label: '处置措施',
+                position: { x: 300, y: 650 },
+                attrs: {
+                    body: {
+                        stroke: '#ea580c',
+                        fill: '#fff7ed',
+                    },
+                    label: {
+                        text: '处置措施',
+                    }
+                }
+            }
+        ];
+
+        // 添加节点到画布
+        nodes.forEach(node => {
+            graph.addNode({
+                ...node,
+                ports: {
+                    items: [
+                        { group: 'top' },
+                        { group: 'bottom' },
+                    ],
+                },
+            });
+        });
+
+        // 添加条件文本标签
+        const labels = [
+            {
+                id: 'label1',
+                shape: 'label',
+                text: 'IF（漏洞存在）',
+                position: { x: 100, y: 445 },
+            },
+            {
+                id: 'label2',
+                shape: 'label',
+                text: 'ELSE-IF（不存在）',
+                position: { x: 300, y: 445 },
+            },
+            {
+                id: 'label3',
+                shape: 'label',
+                text: 'ELSE（未知）',
+                position: { x: 500, y: 445 },
+            },
+        ];
+
+        // 注册标签节点
+        X6.Graph.registerNode('label', {
+            inherit: 'rect',
+            markup: [{
+                tagName: 'text',
+                selector: 'label',
+            }],
+            attrs: {
+                label: {
+                    fontSize: 12,
+                    fill: '#666',
+                    textAnchor: 'start',
+                    textVerticalAnchor: 'middle',
+                },
+            },
+        });
+
+        // 添加标签到画布
+        labels.forEach(label => {
+            graph.addNode({
+                ...label,
+                attrs: {
+                    label: {
+                        text: label.text,
+                    },
+                },
+            });
+        });
+
+        // 创建连接线
+        const edges = [
+            {
+                source: { cell: 'node1', port: 'bottom' },
+                target: { cell: 'node2', port: 'top' },
+                attrs: {
+                    line: {
+                        stroke: '#5F95FF',
+                        strokeWidth: 1,
+                    },
+                },
+            },
+            {
+                source: { cell: 'node2', port: 'bottom' },
+                target: { cell: 'node3', port: 'top' },
+                attrs: {
+                    line: {
+                        stroke: '#5F95FF',
+                        strokeWidth: 1,
+                    },
+                },
+            },
+            {
+                source: { cell: 'node3', port: 'bottom' },
+                target: { cell: 'node4', port: 'top' },
+                attrs: {
+                    line: {
+                        stroke: '#5F95FF',
+                        strokeWidth: 1,
+                    },
+                },
+            },
+            {
+                source: { cell: 'node4', port: 'bottom' },
+                target: { cell: 'node5', port: 'top' },
+                attrs: {
+                    line: {
+                        stroke: '#5F95FF',
+                        strokeWidth: 1,
+                        strokeDasharray: '5 5',
+                    },
+                },
+            },
+            {
+                source: { cell: 'node4', port: 'bottom' },
+                target: { cell: 'node6', port: 'top' },
+                attrs: {
+                    line: {
+                        stroke: '#5F95FF',
+                        strokeWidth: 1,
+                    },
+                },
+            },
+            {
+                source: { cell: 'node4', port: 'bottom' },
+                target: { cell: 'node7', port: 'top' },
+                attrs: {
+                    line: {
+                        stroke: '#5F95FF',
+                        strokeWidth: 1,
+                        strokeDasharray: '5 5',
+                    },
+                },
+            },
+            {
+                source: { cell: 'node5', port: 'bottom' },
+                target: { cell: 'node8', port: 'top' },
+                attrs: {
+                    line: {
+                        stroke: '#5F95FF',
+                        strokeWidth: 1,
+                    },
+                },
+            },
+            {
+                source: { cell: 'node6', port: 'bottom' },
+                target: { cell: 'node8', port: 'top' },
+                attrs: {
+                    line: {
+                        stroke: '#5F95FF',
+                        strokeWidth: 1,
+                    },
+                },
+            },
+            {
+                source: { cell: 'node7', port: 'bottom' },
+                target: { cell: 'node8', port: 'top' },
+                attrs: {
+                    line: {
+                        stroke: '#5F95FF',
+                        strokeWidth: 1,
+                    },
+                },
+            },
+            {
+                source: { cell: 'node8', port: 'bottom' },
+                target: { cell: 'node9', port: 'top' },
+                attrs: {
+                    line: {
+                        stroke: '#5F95FF',
+                        strokeWidth: 1,
+                    },
+                },
+            }
+        ];
+
+        // 添加连接线到画布
+        edges.forEach(edge => {
+            graph.addEdge(edge);
+        });
+
+        // 版本下拉菜单切换
+        function toggleVersionDropdown() {
+            const dropdown = document.getElementById('versionDropdown');
+            dropdown.classList.toggle('hidden');
+        }
+
+        // 点击其他地方关闭下拉菜单
+        document.addEventListener('click', (e) => {
+            const dropdown = document.getElementById('versionDropdown');
+            const button = e.target.closest('button');
+            if (!button || !button.matches('[onclick="toggleVersionDropdown()"]')) {
+                dropdown.classList.add('hidden');
+            }
+        });
+
+        // 节点配置模板
+        const nodeConfigs = {
+            '数据输入': `
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">节点名称</label>
+                    <input type="text" class="w-full border rounded-lg px-3 py-2" value="数据输入">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">数据类型</label>
+                    <select class="w-full border rounded-lg px-3 py-2">
+                        <option>风险</option>
+                        <option>漏洞</option>
+                        <option>资产</option>
+                        <option>情报</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">执行时序</label>
+                    <select class="w-full border rounded-lg px-3 py-2">
+                        <option>执行完毕才可继续</option>
+                        <option>执行开始则可继续</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">错误处理</label>
+                    <select class="w-full border rounded-lg px-3 py-2">
+                        <option>继续执行</option>
+                        <option>终止流程</option>
+                        <option>跳过节点</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">描述</label>
+                    <textarea class="w-full border rounded-lg px-3 py-2 h-24"></textarea>
+                </div>
+                <div>
+                    <div class="flex items-center justify-between">
+                        <label class="block text-sm font-medium text-gray-700">通知</label>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" class="sr-only peer" onchange="toggleNotification(this)">
+                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                        </label>
+                    </div>
+                    <div class="notification-config hidden mt-3">
+                        <select class="w-full border rounded-lg px-3 py-2">
+                            <option>张三</option>
+                            <option>李四</option>
+                            <option>王五</option>
+                        </select>
+                    </div>
+                </div>
+            `,
+            '漏洞扫描(APTP)': `
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">节点名称</label>
+                    <input type="text" class="w-full border rounded-lg px-3 py-2" value="漏洞扫描(APTP)">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">执行超时</label>
+                    <input type="number" class="w-full border rounded-lg px-3 py-2" value="30">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">重试次数</label>
+                    <input type="number" class="w-full border rounded-lg px-3 py-2" value="3">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">执行时序</label>
+                    <select class="w-full border rounded-lg px-3 py-2">
+                        <option>执行完毕才可继续</option>
+                        <option>执行开始则可继续</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">错误处理</label>
+                    <select class="w-full border rounded-lg px-3 py-2">
+                        <option>继续执行</option>
+                        <option>终止流程</option>
+                        <option>跳过节点</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">描述</label>
+                    <textarea class="w-full border rounded-lg px-3 py-2 h-24"></textarea>
+                </div>
+                <div>
+                    <div class="flex items-center justify-between">
+                        <label class="block text-sm font-medium text-gray-700">通知</label>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" class="sr-only peer" onchange="toggleNotification(this)">
+                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                        </label>
+                    </div>
+                    <div class="notification-config hidden mt-3">
+                        <select class="w-full border rounded-lg px-3 py-2">
+                            <option>张三</option>
+                            <option>李四</option>
+                            <option>王五</option>
+                        </select>
+                    </div>
+                </div>
+            `,
+            '漏洞验证(APTP)': `
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">节点名称</label>
+                    <input type="text" class="w-full border rounded-lg px-3 py-2" value="漏洞验证(APTP)">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">执行超时</label>
+                    <input type="number" class="w-full border rounded-lg px-3 py-2" value="30">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">重试次数</label>
+                    <input type="number" class="w-full border rounded-lg px-3 py-2" value="3">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">执行时序</label>
+                    <select class="w-full border rounded-lg px-3 py-2">
+                        <option>执行完毕才可继续</option>
+                        <option>执行开始则可继续</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">错误处理</label>
+                    <select class="w-full border rounded-lg px-3 py-2">
+                        <option>继续执行</option>
+                        <option>终止流程</option>
+                        <option>跳过节点</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">描述</label>
+                    <textarea class="w-full border rounded-lg px-3 py-2 h-24"></textarea>
+                </div>
+                <div>
+                    <div class="flex items-center justify-between">
+                        <label class="block text-sm font-medium text-gray-700">通知</label>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" class="sr-only peer" onchange="toggleNotification(this)">
+                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                        </label>
+                    </div>
+                    <div class="notification-config hidden mt-3">
+                        <select class="w-full border rounded-lg px-3 py-2">
+                            <option>张三</option>
+                            <option>李四</option>
+                            <option>王五</option>
+                        </select>
+                    </div>
+                </div>
+            `,
+            '条件判断(漏洞是否存在)': `
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">节点名称</label>
+                    <input type="text" class="w-full border rounded-lg px-3 py-2" value="条件判断(漏洞是否存在)">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">条件类型</label>
+                    <select class="w-full border rounded-lg px-3 py-2">
+                        <option>漏洞是否存在</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">描述</label>
+                    <textarea class="w-full border rounded-lg px-3 py-2 h-24"></textarea>
+                </div>
+                <div>
+                    <div class="flex items-center justify-between">
+                        <label class="block text-sm font-medium text-gray-700">通知</label>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" class="sr-only peer" onchange="toggleNotification(this)">
+                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                        </label>
+                    </div>
+                    <div class="notification-config hidden mt-3">
+                        <select class="w-full border rounded-lg px-3 py-2">
+                            <option>张三</option>
+                            <option>李四</option>
+                            <option>王五</option>
+                        </select>
+                    </div>
+                </div>
+            `,
+            '标记节点': `
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">节点名称</label>
+                    <input type="text" class="w-full border rounded-lg px-3 py-2" value="">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">打标签</label>
+                    <select class="w-full border rounded-lg px-3 py-2" onchange="handleTagSelect(this)">
+                        <option>重点关注</option>
+                        <option>非重点</option>
+                        <option>标签1</option>
+                        <option>标签2</option>
+                        <option value="new">+ 新增标签</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">执行时序</label>
+                    <select class="w-full border rounded-lg px-3 py-2">
+                        <option>执行完毕才可继续</option>
+                        <option>执行开始则可继续</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">错误处理</label>
+                    <select class="w-full border rounded-lg px-3 py-2">
+                        <option>继续执行</option>
+                        <option>终止流程</option>
+                        <option>跳过节点</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">描述</label>
+                    <textarea class="w-full border rounded-lg px-3 py-2 h-24"></textarea>
+                </div>
+                <div>
+                    <div class="flex items-center justify-between">
+                        <label class="block text-sm font-medium text-gray-700">通知</label>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" class="sr-only peer" onchange="toggleNotification(this)">
+                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                        </label>
+                    </div>
+                    <div class="notification-config hidden mt-3">
+                        <select class="w-full border rounded-lg px-3 py-2">
+                            <option>张三</option>
+                            <option>李四</option>
+                            <option>王五</option>
+                        </select>
+                    </div>
+                </div>
+            `,
+            '生成工单': `
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">节点名称</label>
+                    <input type="text" class="w-full border rounded-lg px-3 py-2" value="生成工单">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">执行超时</label>
+                    <input type="number" class="w-full border rounded-lg px-3 py-2" value="30">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">重试次数</label>
+                    <input type="number" class="w-full border rounded-lg px-3 py-2" value="3">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">执行时序</label>
+                    <select class="w-full border rounded-lg px-3 py-2">
+                        <option>执行完毕才可继续</option>
+                        <option>执行开始则可继续</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">错误处理</label>
+                    <select class="w-full border rounded-lg px-3 py-2">
+                        <option>继续执行</option>
+                        <option>终止流程</option>
+                        <option>跳过节点</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">描述</label>
+                    <textarea class="w-full border rounded-lg px-3 py-2 h-24"></textarea>
+                </div>
+                <div>
+                    <div class="flex items-center justify-between">
+                        <label class="block text-sm font-medium text-gray-700">通知</label>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" class="sr-only peer" onchange="toggleNotification(this)">
+                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                        </label>
+                    </div>
+                    <div class="notification-config hidden mt-3">
+                        <select class="w-full border rounded-lg px-3 py-2">
+                            <option>张三</option>
+                            <option>李四</option>
+                            <option>王五</option>
+                        </select>
+                    </div>
+                </div>
+            `,
+            '处置措施': `
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">节点名称</label>
+                    <input type="text" class="w-full border rounded-lg px-3 py-2" value="处置措施">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">执行超时</label>
+                    <input type="number" class="w-full border rounded-lg px-3 py-2" value="30">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">重试次数</label>
+                    <input type="number" class="w-full border rounded-lg px-3 py-2" value="3">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">执行时序</label>
+                    <select class="w-full border rounded-lg px-3 py-2">
+                        <option>执行完毕才可继续</option>
+                        <option>执行开始则可继续</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">错误处理</label>
+                    <select class="w-full border rounded-lg px-3 py-2">
+                        <option>继续执行</option>
+                        <option>终止流程</option>
+                        <option>跳过节点</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">描述</label>
+                    <textarea class="w-full border rounded-lg px-3 py-2 h-24"></textarea>
+                </div>
+                <div>
+                    <div class="flex items-center justify-between">
+                        <label class="block text-sm font-medium text-gray-700">通知</label>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" class="sr-only peer" onchange="toggleNotification(this)">
+                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                        </label>
+                    </div>
+                    <div class="notification-config hidden mt-3">
+                        <select class="w-full border rounded-lg px-3 py-2">
+                            <option>张三</option>
+                            <option>李四</option>
+                            <option>王五</option>
+                        </select>
+                    </div>
+                </div>
+            `
+        };
+
+        let selectedNode = null;
+
+        // 节点点击事件处理
+        graph.on('cell:click', ({ cell }) => {
+            if (cell.isNode()) {
+                // 移除之前选中节点的样式
+                if (selectedNode) {
+                    const prevNode = graph.getCellById(selectedNode.id);
+                    if (prevNode) {
+                        prevNode.setAttrs({
+                            body: {
+                                strokeWidth: 1,
+                                fill: '#ffffff',
+                                filter: 'none',
+                            }
+                        });
+                    }
+                }
+
+                // 添加新选中节点的样式
+                cell.setAttrs({
+                    body: {
+                        strokeWidth: 2,
+                        fill: '#f3f4f6',
+                        filter: 'drop-shadow(0 0 6px rgba(37, 99, 235, 0.5))',
+                    }
+                });
+                selectedNode = cell;
+
+                // 更新属性配置面板
+                const nodeLabel = cell.attr('label/text');
+                let configTemplate = nodeConfigs[nodeLabel];
+
+                // 处理标记节点（包括"标记为有效风险"、"标记为误报"、"忽略"）
+                if (['标记为有效风险', '标记为误报', '忽略'].includes(nodeLabel)) {
+                    configTemplate = nodeConfigs['标记节点'];
+                    // 设置节点名称
+                    const configDiv = document.createElement('div');
+                    configDiv.innerHTML = configTemplate;
+                    configDiv.querySelector('input[type="text"]').value = nodeLabel;
+                    configTemplate = configDiv.innerHTML;
+                }
+
+                document.getElementById('nodeConfig').innerHTML = configTemplate || `
+                    <div class="text-gray-500 text-center py-8">
+                        未找到该节点的配置信息
+                    </div>
+                `;
+            }
+        });
+
+        // 节点鼠标移入事件
+        graph.on('node:mouseenter', ({ node }) => {
+            if (selectedNode && selectedNode.id === node.id) return;
+            node.setAttrs({
+                body: {
+                    fill: '#f3f4f6',
+                    filter: 'drop-shadow(0 0 4px rgba(37, 99, 235, 0.3))',
+                },
+            });
+        });
+
+        // 节点鼠标移出事件
+        graph.on('node:mouseleave', ({ node }) => {
+            if (selectedNode && selectedNode.id === node.id) return;
+            node.setAttrs({
+                body: {
+                    fill: '#ffffff',
+                    filter: 'none',
+                },
+            });
+        });
+
+        // 通知开关处理函数
+        function toggleNotification(checkbox) {
+            const notificationConfig = checkbox.closest('div').nextElementSibling;
+            if (checkbox.checked) {
+                notificationConfig.classList.remove('hidden');
+            } else {
+                notificationConfig.classList.add('hidden');
+            }
+        }
+
+        // 标签选择处理函数
+        function handleTagSelect(select) {
+            if (select.value === 'new') {
+                const newTag = prompt('请输入新标签名称：');
+                if (newTag) {
+                    const option = document.createElement('option');
+                    option.text = newTag;
+                    option.value = newTag;
+                    select.insertBefore(option, select.lastElementChild);
+                    select.value = newTag;
+                } else {
+                    select.value = select.options[0].value;
+                }
+            }
+        }
+    </script>
+</body>
+</html> 
