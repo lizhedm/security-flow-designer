@@ -8,14 +8,26 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         .panel {
-            @apply bg-white rounded-lg shadow-sm p-4;
-            height: calc(50vh - 3rem);
+            @apply bg-white rounded-lg shadow-sm p-4 overflow-auto;
+            height: calc(45vh - 2rem);
+            margin: 1rem;
+            background-color: #f8fafc;
         }
         .panel-title {
-            @apply text-lg font-semibold mb-4 flex justify-between items-center;
+            @apply text-lg font-semibold mb-4 flex justify-between items-center sticky top-0 bg-gray-50 p-2 rounded-t-lg;
         }
         .tool-icon {
-            @apply w-20 h-20 flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 hover:border-blue-500 hover:bg-blue-50 cursor-pointer transition-all duration-200;
+            @apply w-24 h-24 flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 hover:border-blue-500 hover:bg-blue-50 cursor-pointer transition-all duration-200;
+        }
+        .tool-category {
+            @apply mb-6;
+        }
+        .tool-category-title {
+            @apply text-sm font-medium text-gray-700 mb-2 px-2;
+        }
+        .tools-grid {
+            @apply grid grid-cols-4 gap-4 overflow-y-auto p-2;
+            max-height: calc(45vh - 8rem);
         }
     </style>
 </head>
@@ -109,34 +121,107 @@
                 <span>工具集成区</span>
                 <button class="text-sm text-blue-600 hover:text-blue-800">查看使用说明</button>
             </div>
-            <div class="grid grid-cols-4 gap-4">
-                <div class="tool-icon" onclick="callTool('scanner')">
-                    <i class="fas fa-search text-2xl text-blue-600 mb-2"></i>
-                    <span class="text-sm">漏洞验证</span>
+            <div class="tools-grid">
+                <!-- 基础分析工具 -->
+                <div class="tool-category">
+                    <h3 class="tool-category-title">基础分析工具</h3>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="tool-icon" onclick="callTool('scanner')">
+                            <i class="fas fa-search text-2xl text-blue-600 mb-2"></i>
+                            <span class="text-sm">漏洞验证</span>
+                        </div>
+                        <div class="tool-icon" onclick="callTool('traffic')">
+                            <i class="fas fa-chart-line text-2xl text-green-600 mb-2"></i>
+                            <span class="text-sm">流量分析</span>
+                        </div>
+                    </div>
                 </div>
-                <div class="tool-icon" onclick="callTool('traffic')">
-                    <i class="fas fa-chart-line text-2xl text-green-600 mb-2"></i>
-                    <span class="text-sm">流量分析</span>
+
+                <!-- 网络分析工具 -->
+                <div class="tool-category">
+                    <h3 class="tool-category-title">网络分析工具</h3>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="tool-icon" onclick="callTool('tcpdump')">
+                            <i class="fas fa-network-wired text-2xl text-purple-600 mb-2"></i>
+                            <span class="text-sm">Tcpdump</span>
+                        </div>
+                        <div class="tool-icon" onclick="callTool('netstat')">
+                            <i class="fas fa-project-diagram text-2xl text-indigo-600 mb-2"></i>
+                            <span class="text-sm">Netstat/ss</span>
+                        </div>
+                        <div class="tool-icon" onclick="callTool('ping')">
+                            <i class="fas fa-exchange-alt text-2xl text-blue-600 mb-2"></i>
+                            <span class="text-sm">Ping</span>
+                        </div>
+                    </div>
                 </div>
-                <div class="tool-icon" onclick="callTool('domain')">
-                    <i class="fas fa-globe text-2xl text-purple-600 mb-2"></i>
-                    <span class="text-sm">域名解析</span>
+
+                <!-- 防火墙管理工具 -->
+                <div class="tool-category">
+                    <h3 class="tool-category-title">防火墙管理</h3>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="tool-icon" onclick="callTool('iptables')">
+                            <i class="fas fa-shield-alt text-2xl text-red-600 mb-2"></i>
+                            <span class="text-sm">IPTables</span>
+                        </div>
+                        <div class="tool-icon" onclick="callTool('ufw')">
+                            <i class="fas fa-fire-alt text-2xl text-orange-600 mb-2"></i>
+                            <span class="text-sm">UFW</span>
+                        </div>
+                    </div>
                 </div>
-                <div class="tool-icon" onclick="callTool('sandbox')">
-                    <i class="fas fa-box text-2xl text-orange-600 mb-2"></i>
-                    <span class="text-sm">沙箱分析</span>
+
+                <!-- 入侵检测工具 -->
+                <div class="tool-category">
+                    <h3 class="tool-category-title">入侵检测</h3>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="tool-icon" onclick="callTool('snort')">
+                            <i class="fas fa-eye text-2xl text-green-600 mb-2"></i>
+                            <span class="text-sm">Snort</span>
+                        </div>
+                        <div class="tool-icon" onclick="callTool('suricata')">
+                            <i class="fas fa-shield-virus text-2xl text-yellow-600 mb-2"></i>
+                            <span class="text-sm">Suricata</span>
+                        </div>
+                        <div class="tool-icon" onclick="callTool('ossec')">
+                            <i class="fas fa-user-shield text-2xl text-blue-600 mb-2"></i>
+                            <span class="text-sm">OSSEC</span>
+                        </div>
+                    </div>
                 </div>
-                <div class="tool-icon" onclick="callTool('cloud')">
-                    <i class="fas fa-cloud text-2xl text-cyan-600 mb-2"></i>
-                    <span class="text-sm">云配置检查</span>
+
+                <!-- 恶意软件检测工具 -->
+                <div class="tool-category">
+                    <h3 class="tool-category-title">恶意软件检测</h3>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="tool-icon" onclick="callTool('clamav')">
+                            <i class="fas fa-virus-slash text-2xl text-red-600 mb-2"></i>
+                            <span class="text-sm">ClamAV</span>
+                        </div>
+                        <div class="tool-icon" onclick="callTool('chkrootkit')">
+                            <i class="fas fa-bug text-2xl text-purple-600 mb-2"></i>
+                            <span class="text-sm">Chkrootkit</span>
+                        </div>
+                    </div>
                 </div>
-                <div class="tool-icon" onclick="callTool('email')">
-                    <i class="fas fa-envelope text-2xl text-red-600 mb-2"></i>
-                    <span class="text-sm">邮件分析</span>
+
+                <!-- 审计工具 -->
+                <div class="tool-category">
+                    <h3 class="tool-category-title">系统审计</h3>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="tool-icon" onclick="callTool('auditd')">
+                            <i class="fas fa-clipboard-list text-2xl text-gray-600 mb-2"></i>
+                            <span class="text-sm">Auditd</span>
+                        </div>
+                        <div class="tool-icon" onclick="callTool('lynis')">
+                            <i class="fas fa-tasks text-2xl text-teal-600 mb-2"></i>
+                            <span class="text-sm">Lynis</span>
+                        </div>
+                    </div>
                 </div>
             </div>
             <!-- 工具调用结果区域 -->
-            <div id="toolResult" class="mt-4 p-4 bg-gray-50 rounded-lg hidden">
+            <div id="toolResult" class="mt-4 p-4 bg-white rounded-lg hidden">
                 <div class="flex justify-between items-center mb-2">
                     <span class="text-sm font-medium">分析结果</span>
                     <div class="flex items-center space-x-2">
@@ -244,7 +329,19 @@
                 domain: "域名解析中...\n关联域名: example.com\nIP: 192.168.1.100",
                 sandbox: "样本分析中...\n行为评分: 95\n发现恶意行为特征...",
                 cloud: "云配置检查开始...\n正在扫描安全组配置...\n发现2个配置问题",
-                email: "邮件分析启动...\n提取附件中...\n完成分析，未发现恶意内容"
+                email: "邮件分析启动...\n提取附件中...\n完成分析，未发现恶意内容",
+                tcpdump: "正在捕获网络流量...\n发现可疑数据包\n源IP: 192.168.1.100\n目标IP: 10.0.0.1",
+                netstat: "当前网络连接统计：\n活动连接：23\n监听端口：12\n可疑连接：2",
+                ping: "正在测试网络连通性...\n目标可达\n平均响应时间：20ms",
+                iptables: "防火墙规则检查：\n入站规则：15条\n出站规则：8条\n发现2条异常规则",
+                ufw: "UFW状态：激活\n默认策略：拒绝\n自定义规则：10条",
+                snort: "入侵检测分析：\n告警数量：5\n高危威胁：2\n可疑行为：3",
+                suricata: "实时监控中...\n检测到异常流量模式\n正在生成详细报告",
+                ossec: "主机入侵检测：\n文件完整性：正常\n系统日志：发现异常\n需要关注的事件：3个",
+                clamav: "病毒扫描中...\n扫描文件：1205\n发现可疑文件：2\n清理建议已生成",
+                chkrootkit: "Rootkit检查：\n系统文件：正常\n发现可疑进程：1个\n建议深入分析",
+                auditd: "系统审计：\n用户活动：正常\n特权操作：3次\n可疑命令执行：1次",
+                lynis: "安全审计进行中...\n系统得分：82/100\n发现5个安全建议\n3个需要立即处理"
             };
             
             toolResult.querySelector('pre').textContent = results[toolType] || "工具调用中...";
