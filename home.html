@@ -17,10 +17,11 @@
         }
     </style>
 </head>
-<body class="h-screen flex flex-col">
+<body class="h-screen flex flex-col bg-gray-100">
     <!-- 顶部导航栏 -->
     <nav class="bg-white border-b px-6 py-4 flex justify-between items-center">
-        <div class="flex space-x-8">
+        <div class="flex items-center space-x-8">
+            <h1 class="text-xl font-bold text-gray-900 mr-8">网络安全共享研判系统</h1>
             <a href="#" class="nav-item active px-2 py-1" onclick="switchNav('business')">业务中心</a>
             <a href="#" class="nav-item px-2 py-1" onclick="switchNav('risk')">风险研判</a>
             <a href="#" class="nav-item px-2 py-1" onclick="switchNav('asset')">资产汇聚</a>
@@ -72,6 +73,7 @@
             <!-- 风险研判子菜单 -->
             <div id="risk-menu" class="py-4 hidden">
                 <a href="#" class="subnav-item block px-6 py-2" onclick="loadPage('risk-analysis')">研判分析</a>
+                <a href="#" class="subnav-item block px-6 py-2" onclick="loadPage('flows')">流程管理</a>
             </div>
             <!-- 资产汇聚子菜单 -->
             <div id="asset-menu" class="py-4 hidden">
