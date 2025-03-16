@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>安全流程设计器</title>
+    <title>网络安全共享研判系统</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -72,7 +72,16 @@
             </div>
             <!-- 风险研判子菜单 -->
             <div id="risk-menu" class="py-4 hidden">
-                <a href="#" class="subnav-item block px-6 py-2" onclick="loadPage('risk-analysis')">研判分析</a>
+                <a href="#" class="subnav-item block px-6 py-2" onclick="toggleSubMenu('analysis-submenu', this)">
+                    <span class="flex items-center justify-between">
+                        研判分析
+                        <i class="fas fa-chevron-down text-gray-400 text-xs"></i>
+                    </span>
+                </a>
+                <div id="analysis-submenu" class="hidden pl-6">
+                    <a href="#" class="subnav-item block px-6 py-2" onclick="loadPage('risk-list')">风险列表</a>
+                    <a href="#" class="subnav-item block px-6 py-2" onclick="loadPage('analysis-workbench')">研判工作台</a>
+                </div>
                 <a href="#" class="subnav-item block px-6 py-2" onclick="loadPage('flows')">流程管理</a>
             </div>
             <!-- 资产汇聚子菜单 -->
@@ -129,13 +138,33 @@
             loadPage(defaultPages[nav]);
         }
 
-        // 加载页面内容
-        function loadPage(page) {
-            // 更新子菜单样式
+        // 切换三级菜单
+        function toggleSubMenu(submenuId, element) {
+            const submenu = document.getElementById(submenuId);
+            submenu.classList.toggle('hidden');
+            
+            // 切换箭头方向
+            const arrow = element.querySelector('i');
+            arrow.classList.toggle('fa-chevron-down');
+            arrow.classList.toggle('fa-chevron-up');
+            
+            // 更新选中状态
             document.querySelectorAll('.subnav-item').forEach(item => {
                 item.classList.remove('active');
             });
-            event.target.classList.add('active');
+            element.classList.add('active');
+        }
+
+        // 修改 loadPage 函数
+        function loadPage(page) {
+            // 更新子菜单样式
+            document.querySelectorAll('.subnav-item').forEach(item => {
+                if (item.getAttribute('onclick').includes(page)) {
+                    item.classList.add('active');
+                } else {
+                    item.classList.remove('active');
+                }
+            });
 
             // 加载对应页面
             document.getElementById('content-frame').src = `pages/${page}.html`;

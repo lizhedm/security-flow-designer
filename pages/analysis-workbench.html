@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>研判工作台</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .panel {
+            @apply bg-white rounded-lg shadow-sm p-4;
+            height: calc(50vh - 3rem);
+        }
+        .panel-title {
+            @apply text-lg font-semibold mb-4 flex justify-between items-center;
+        }
+        .tool-icon {
+            @apply w-20 h-20 flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 hover:border-blue-500 hover:bg-blue-50 cursor-pointer transition-all duration-200;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 p-6">
+    <!-- 顶部操作栏 -->
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-2xl font-bold">研判工作台</h1>
+        <div class="flex space-x-4">
+            <button id="completeBtn" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed">
+                完成研判
+            </button>
+            <button id="saveBtn" disabled class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed">
+                保存到知识库
+            </button>
+        </div>
+    </div>
+
+    <!-- 2x2网格布局 -->
+    <div class="grid grid-cols-2 gap-6">
+        <!-- 信息展示区 -->
+        <div class="panel">
+            <div class="panel-title">
+                <span>信息展示区</span>
+                <button class="text-sm text-blue-600 hover:text-blue-800">展开详情</button>
+            </div>
+            <div class="space-y-4">
+                <!-- 基本信息 -->
+                <div>
+                    <h3 class="text-sm font-medium text-gray-500 mb-2">基本信息</h3>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <span class="text-sm text-gray-500">风险ID：</span>
+                            <span id="riskId" class="text-sm">-</span>
+                        </div>
+                        <div>
+                            <span class="text-sm text-gray-500">风险类型：</span>
+                            <span class="text-sm">0day漏洞</span>
+                        </div>
+                        <div>
+                            <span class="text-sm text-gray-500">风险等级：</span>
+                            <span class="text-sm px-2 py-1 rounded-full bg-red-100 text-red-800">高危</span>
+                        </div>
+                        <div>
+                            <span class="text-sm text-gray-500">发现时间：</span>
+                            <span class="text-sm">2024-03-15 10:30</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- 资产信息 -->
+                <div>
+                    <h3 class="text-sm font-medium text-gray-500 mb-2">资产信息</h3>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <span class="text-sm text-gray-500">IP地址：</span>
+                            <span class="text-sm">192.168.1.100</span>
+                        </div>
+                        <div>
+                            <span class="text-sm text-gray-500">所属单位：</span>
+                            <span class="text-sm">政务系统核心机房</span>
+                        </div>
+                        <div>
+                            <span class="text-sm text-gray-500">资产等级：</span>
+                            <span class="text-sm px-2 py-1 rounded-full bg-yellow-100 text-yellow-800">关键基础设施</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- 证据信息 -->
+                <div>
+                    <h3 class="text-sm font-medium text-gray-500 mb-2">证据信息</h3>
+                    <div class="space-y-2">
+                        <div class="flex items-center space-x-2">
+                            <i class="fas fa-file-alt text-gray-400"></i>
+                            <span class="text-sm text-blue-600 hover:text-blue-800 cursor-pointer">查看网络数据包</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <i class="fas fa-file-code text-gray-400"></i>
+                            <span class="text-sm text-blue-600 hover:text-blue-800 cursor-pointer">查看异常日志</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <i class="fas fa-image text-gray-400"></i>
+                            <span class="text-sm text-blue-600 hover:text-blue-800 cursor-pointer">查看攻击截图</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 工具集成区 -->
+        <div class="panel">
+            <div class="panel-title">
+                <span>工具集成区</span>
+                <button class="text-sm text-blue-600 hover:text-blue-800">查看使用说明</button>
+            </div>
+            <div class="grid grid-cols-4 gap-4">
+                <div class="tool-icon" onclick="callTool('scanner')">
+                    <i class="fas fa-search text-2xl text-blue-600 mb-2"></i>
+                    <span class="text-sm">漏洞验证</span>
+                </div>
+                <div class="tool-icon" onclick="callTool('traffic')">
+                    <i class="fas fa-chart-line text-2xl text-green-600 mb-2"></i>
+                    <span class="text-sm">流量分析</span>
+                </div>
+                <div class="tool-icon" onclick="callTool('domain')">
+                    <i class="fas fa-globe text-2xl text-purple-600 mb-2"></i>
+                    <span class="text-sm">域名解析</span>
+                </div>
+                <div class="tool-icon" onclick="callTool('sandbox')">
+                    <i class="fas fa-box text-2xl text-orange-600 mb-2"></i>
+                    <span class="text-sm">沙箱分析</span>
+                </div>
+                <div class="tool-icon" onclick="callTool('cloud')">
+                    <i class="fas fa-cloud text-2xl text-cyan-600 mb-2"></i>
+                    <span class="text-sm">云配置检查</span>
+                </div>
+                <div class="tool-icon" onclick="callTool('email')">
+                    <i class="fas fa-envelope text-2xl text-red-600 mb-2"></i>
+                    <span class="text-sm">邮件分析</span>
+                </div>
+            </div>
+            <!-- 工具调用结果区域 -->
+            <div id="toolResult" class="mt-4 p-4 bg-gray-50 rounded-lg hidden">
+                <div class="flex justify-between items-center mb-2">
+                    <span class="text-sm font-medium">分析结果</span>
+                    <div class="flex items-center space-x-2">
+                        <span class="text-sm text-blue-600 hover:text-blue-800 cursor-pointer">查看结果详情</span>
+                        <button class="text-sm text-gray-500" onclick="closeToolResult()">关闭</button>
+                    </div>
+                </div>
+                <pre class="text-sm text-gray-600 whitespace-pre-wrap"></pre>
+            </div>
+        </div>
+
+        <!-- 知识库调用区 -->
+        <div class="panel">
+            <div class="panel-title">
+                <span>知识库调用区</span>
+                <div class="flex space-x-2">
+                    <input type="text" placeholder="搜索相似案例..." class="text-sm px-3 py-1 border rounded-lg">
+                    <button class="text-sm text-blue-600 hover:text-blue-800">搜索</button>
+                </div>
+            </div>
+            <!-- 知识库搜索结果 -->
+            <div class="space-y-4">
+                <div class="p-4 border rounded-lg hover:bg-gray-50 cursor-pointer">
+                    <div class="flex justify-between items-start mb-2">
+                        <span class="text-sm font-medium">相似案例 #KB-001</span>
+                        <span class="text-xs text-gray-500">相似度: 92%</span>
+                    </div>
+                    <p class="text-sm text-gray-600 mb-2">SQL注入漏洞导致的数据泄露事件分析...</p>
+                    <div class="flex items-center space-x-2">
+                        <span class="text-xs px-2 py-1 bg-blue-100 text-blue-800 rounded-full">已解决</span>
+                        <span class="text-xs text-gray-500">2024-02-15</span>
+                    </div>
+                </div>
+                <!-- 更多相似案例... -->
+            </div>
+        </div>
+
+        <!-- 研判记录区 -->
+        <div class="panel">
+            <div class="panel-title">
+                <span>研判记录区</span>
+                <button class="text-sm text-blue-600 hover:text-blue-800">添加附件</button>
+            </div>
+            <div class="space-y-4">
+                <!-- 分析步骤 -->
+                <div>
+                    <h3 class="text-sm font-medium text-gray-500 mb-2">分析步骤</h3>
+                    <textarea class="w-full h-20 text-sm p-2 border rounded-lg" placeholder="记录分析思路和步骤..."></textarea>
+                </div>
+                <!-- 结论 -->
+                <div>
+                    <h3 class="text-sm font-medium text-gray-500 mb-2">研判结论</h3>
+                    <div class="grid grid-cols-2 gap-4">
+                        <select class="text-sm p-2 border rounded-lg">
+                            <option>选择结论</option>
+                            <option>有效</option>
+                            <option>误报</option>
+                        </select>
+                        <select class="text-sm p-2 border rounded-lg">
+                            <option>风险等级</option>
+                            <option>1级</option>
+                            <option>2级</option>
+                            <option>3级</option>
+                            <option>4级</option>
+                            <option>5级</option>
+                        </select>
+                    </div>
+                </div>
+                <!-- 附件列表 -->
+                <div>
+                    <h3 class="text-sm font-medium text-gray-500 mb-2">附件列表</h3>
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-between p-2 bg-gray-50 rounded-lg">
+                            <div class="flex items-center space-x-2">
+                                <i class="fas fa-file text-gray-400"></i>
+                                <span class="text-sm">分析报告.pdf</span>
+                            </div>
+                            <button class="text-sm text-red-600 hover:text-red-800">删除</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 页面加载时获取风险ID
+        window.onload = function() {
+            const riskId = sessionStorage.getItem('currentRiskId');
+            if (riskId) {
+                document.getElementById('riskId').textContent = riskId;
+                // 这里可以根据风险ID加载详细信息
+            }
+        }
+
+        // 工具调用函数
+        function callTool(toolType) {
+            const toolResult = document.getElementById('toolResult');
+            toolResult.classList.remove('hidden');
+            
+            // 模拟工具调用结果
+            const results = {
+                scanner: "正在进行漏洞扫描...\n发现3个高危漏洞\n详细报告生成中...",
+                traffic: "流量分析启动...\n检测到异常连接\n正在生成流量报告...",
+                domain: "域名解析中...\n关联域名: example.com\nIP: 192.168.1.100",
+                sandbox: "样本分析中...\n行为评分: 95\n发现恶意行为特征...",
+                cloud: "云配置检查开始...\n正在扫描安全组配置...\n发现2个配置问题",
+                email: "邮件分析启动...\n提取附件中...\n完成分析，未发现恶意内容"
+            };
+            
+            toolResult.querySelector('pre').textContent = results[toolType] || "工具调用中...";
+        }
+
+        // 关闭工具结果
+        function closeToolResult() {
+            document.getElementById('toolResult').classList.add('hidden');
+        }
+
+        // 完成研判按钮点击事件
+        document.getElementById('completeBtn').addEventListener('click', function() {
+            this.disabled = true;
+            document.getElementById('saveBtn').disabled = false;
+        });
+
+        // 保存到知识库按钮点击事件
+        document.getElementById('saveBtn').addEventListener('click', function() {
+            // 这里添加保存到知识库的逻辑
+            alert('研判结果已保存到知识库');
+        });
+    </script>
+</body>
+</html> 
