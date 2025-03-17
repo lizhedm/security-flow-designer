@@ -173,7 +173,7 @@
             // 将风险ID存储到 sessionStorage
             sessionStorage.setItem('currentRiskId', riskId);
             // 跳转到研判工作台
-            window.parent.document.getElementById('content-frame').src = 'pages/analysis-workbench.html';
+            window.parent.loadPage('analysis-workbench');
         }
     </script>
 </body>

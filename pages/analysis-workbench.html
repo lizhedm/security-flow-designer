@@ -8,26 +8,74 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         .panel {
-            @apply bg-white rounded-lg shadow-sm p-4 overflow-auto;
-            height: calc(45vh - 2rem);
-            margin: 1rem;
-            background-color: #f8fafc;
+            @apply bg-white rounded-lg shadow-sm overflow-auto;
+            height: 500px;
+            background-color: #f3f4f6;
+            padding: 1rem;
+        }
+        .panel-content {
+            @apply p-8 space-y-6;
         }
         .panel-title {
-            @apply text-lg font-semibold mb-4 flex justify-between items-center sticky top-0 bg-gray-50 p-2 rounded-t-lg;
+            @apply text-xl font-bold mb-8 flex justify-between items-center sticky top-0 bg-gray-100 p-4 rounded-t-lg border-b border-gray-200;
+            font-size: larger;
         }
         .tool-icon {
             @apply w-24 h-24 flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 hover:border-blue-500 hover:bg-blue-50 cursor-pointer transition-all duration-200;
         }
         .tool-category {
-            @apply mb-6;
+            @apply mb-8;
         }
         .tool-category-title {
-            @apply text-sm font-medium text-gray-700 mb-2 px-2;
+            @apply text-sm font-medium text-gray-700 mb-4 px-2;
         }
         .tools-grid {
-            @apply grid grid-cols-4 gap-4 overflow-y-auto p-2;
+            @apply grid grid-cols-4 gap-6 overflow-y-auto p-4;
             max-height: calc(45vh - 8rem);
+        }
+        .modal-backdrop {
+            @apply fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+        }
+        .modal-content {
+            @apply bg-white rounded-lg shadow-sm;
+            width: 600px;
+            position: relative;
+            padding:10px;
+            background-color: #f8f8f8;
+            margin: auto;
+            border: 1px solid #e5e7eb;
+        }
+        .modal-header {
+            @apply flex justify-between items-center p-4 border-b border-gray-200 bg-gray-50 rounded-t-lg;
+        }
+        .modal-body {
+            @apply p-6 max-h-[60vh] overflow-y-auto bg-white;
+        }
+        .modal-footer {
+            @apply flex justify-end p-4 space-x-3 border-t border-gray-200 bg-gray-50 rounded-b-lg;
+        }
+        .btn {
+            @apply px-4 py-2 rounded-lg flex items-center justify-center transition-all duration-200;
+        }
+        .btn i {
+            @apply mr-2;
+        }
+        .btn-primary {
+            @apply bg-blue-600 text-white hover:bg-blue-700;
+        }
+        .btn-secondary {
+            @apply bg-gray-200 text-gray-700 hover:bg-gray-300;
+        }
+        .btn-danger {
+            @apply bg-red-600 text-white hover:bg-red-700;
+        }
+        .btn-disabled {
+            @apply bg-gray-100 text-gray-400 cursor-not-allowed;
         }
     </style>
 </head>
@@ -50,7 +98,7 @@
         <!-- 信息展示区 -->
         <div class="panel">
             <div class="panel-title">
-                <span>信息展示区</span>
+                <span>信息展示</span>
                 <button class="text-sm text-blue-600 hover:text-blue-800">展开详情</button>
             </div>
             <div class="space-y-4">
@@ -118,7 +166,7 @@
         <!-- 工具集成区 -->
         <div class="panel">
             <div class="panel-title">
-                <span>工具集成区</span>
+                <span>工具集成</span>
                 <button class="text-sm text-blue-600 hover:text-blue-800">查看使用说明</button>
             </div>
             <div class="tools-grid">
@@ -128,11 +176,15 @@
                     <div class="grid grid-cols-2 gap-4">
                         <div class="tool-icon" onclick="callTool('scanner')">
                             <i class="fas fa-search text-2xl text-blue-600 mb-2"></i>
-                            <span class="text-sm">漏洞验证</span>
+                            <span class="text-sm">漏洞验证（进行中...）</span>
                         </div>
                         <div class="tool-icon" onclick="callTool('traffic')">
                             <i class="fas fa-chart-line text-2xl text-green-600 mb-2"></i>
-                            <span class="text-sm">流量分析</span>
+                            <span class="text-sm">
+                                流量分析
+                                <i class="fas fa-file-alt text-gray-400"></i>
+                                <span class="text-sm text-blue-600 hover:text-blue-800 cursor-pointer">查看结果</span>
+                            </span>
                         </div>
                     </div>
                 </div>
@@ -220,33 +272,27 @@
                     </div>
                 </div>
             </div>
-            <!-- 工具调用结果区域 -->
-            <div id="toolResult" class="mt-4 p-4 bg-white rounded-lg hidden">
-                <div class="flex justify-between items-center mb-2">
-                    <span class="text-sm font-medium">分析结果</span>
-                    <div class="flex items-center space-x-2">
-                        <span class="text-sm text-blue-600 hover:text-blue-800 cursor-pointer">查看结果详情</span>
-                        <button class="text-sm text-gray-500" onclick="closeToolResult()">关闭</button>
-                    </div>
-                </div>
-                <pre class="text-sm text-gray-600 whitespace-pre-wrap"></pre>
-            </div>
         </div>
 
         <!-- 知识库调用区 -->
         <div class="panel">
             <div class="panel-title">
-                <span>知识库调用区</span>
+                <span>知识库调用</span>
                 <div class="flex space-x-2">
                     <input type="text" placeholder="搜索相似案例..." class="text-sm px-3 py-1 border rounded-lg">
                     <button class="text-sm text-blue-600 hover:text-blue-800">搜索</button>
+                    <button class="text-sm text-blue-600 hover:text-blue-800">刷新相似案例</button>
                 </div>
             </div>
             <!-- 知识库搜索结果 -->
             <div class="space-y-4">
                 <div class="p-4 border rounded-lg hover:bg-gray-50 cursor-pointer">
                     <div class="flex justify-between items-start mb-2">
-                        <span class="text-sm font-medium">相似案例 #KB-001</span>
+                        <span class="text-sm font-medium">
+                            相似案例 #KB-001    
+                            <button class="text-sm text-blue-600 hover:text-blue-800">查看详情</button>
+                            <button class="text-sm text-blue-600 hover:text-blue-800">一键复用</button>
+                        </span>
                         <span class="text-xs text-gray-500">相似度: 92%</span>
                     </div>
                     <p class="text-sm text-gray-600 mb-2">SQL注入漏洞导致的数据泄露事件分析...</p>
@@ -262,8 +308,7 @@
         <!-- 研判记录区 -->
         <div class="panel">
             <div class="panel-title">
-                <span>研判记录区</span>
-                <button class="text-sm text-blue-600 hover:text-blue-800">添加附件</button>
+                <span>研判记录</span>
             </div>
             <div class="space-y-4">
                 <!-- 分析步骤 -->
@@ -293,6 +338,7 @@
                 <!-- 附件列表 -->
                 <div>
                     <h3 class="text-sm font-medium text-gray-500 mb-2">附件列表</h3>
+                    <button class="text-sm text-blue-600 hover:text-blue-800">添加附件</button>
                     <div class="space-y-2">
                         <div class="flex items-center justify-between p-2 bg-gray-50 rounded-lg">
                             <div class="flex items-center space-x-2">
@@ -307,29 +353,85 @@
         </div>
     </div>
 
+    <!-- 工具结果弹窗 -->
+    <div id="toolModal" class="modal-backdrop">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="flex items-center">
+                    <i id="modalIcon" class="fas fa-tools text-2xl text-blue-600 mr-3"></i>
+                    <h3 id="modalTitle" class="text-lg font-bold">工具分析结果</h3>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="flex items-center mb-4 p-3 bg-blue-50 rounded-lg">
+                    <i class="fas fa-spinner fa-spin text-blue-600 mr-3"></i>
+                    <span class="text-blue-600">分析进行中...</span>
+                </div>
+                <pre id="modalContent" class="text-sm text-gray-600 whitespace-pre-wrap bg-gray-50 p-4 rounded-lg"></pre>
+            </div>
+            <div class="modal-footer">
+                <button onclick="runInBackground()" class="btn btn-primary text-sm text-blue-600 hover:text-blue-800 cursor-pointer">
+                    <i class="fas fa-play-circle"></i>
+                    后台运行
+                </button>
+                <button onclick="stopAnalysis()" class="btn btn-danger text-sm text-blue-600 hover:text-blue-800 cursor-pointer">
+                    <i class="fas fa-stop-circle"></i>
+                    停止
+                </button>
+                <button disabled class="btn btn-disabled text-sm text-blue-600 hover:text-blue-800 cursor-pointer">
+                    <i class="fas fa-file-alt"></i>
+                    查看详情
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script>
         // 页面加载时获取风险ID
         window.onload = function() {
             const riskId = sessionStorage.getItem('currentRiskId');
             if (riskId) {
                 document.getElementById('riskId').textContent = riskId;
-                // 这里可以根据风险ID加载详细信息
             }
         }
 
         // 工具调用函数
         function callTool(toolType) {
-            const toolResult = document.getElementById('toolResult');
-            toolResult.classList.remove('hidden');
+            const modal = document.getElementById('toolModal');
+            const modalContent = document.getElementById('modalContent');
+            const modalIcon = document.getElementById('modalIcon');
+            const modalTitle = document.getElementById('modalTitle');
+            
+            // 显示弹窗
+            modal.classList.remove('hidden');
+            
+            // 设置工具特定的图标和标题
+            const toolInfo = {
+                scanner: { icon: 'fa-search', title: '漏洞验证结果', color: 'text-blue-600' },
+                traffic: { icon: 'fa-chart-line', title: '流量分析结果', color: 'text-green-600' },
+                tcpdump: { icon: 'fa-network-wired', title: 'Tcpdump分析结果', color: 'text-purple-600' },
+                netstat: { icon: 'fa-project-diagram', title: '网络连接分析', color: 'text-indigo-600' },
+                ping: { icon: 'fa-exchange-alt', title: '网络连通性测试', color: 'text-blue-600' },
+                iptables: { icon: 'fa-shield-alt', title: '防火墙规则检查', color: 'text-red-600' },
+                ufw: { icon: 'fa-fire-alt', title: 'UFW状态检查', color: 'text-orange-600' },
+                snort: { icon: 'fa-eye', title: 'Snort检测结果', color: 'text-green-600' },
+                suricata: { icon: 'fa-shield-virus', title: 'Suricata监控结果', color: 'text-yellow-600' },
+                ossec: { icon: 'fa-user-shield', title: 'OSSEC检测结果', color: 'text-blue-600' },
+                clamav: { icon: 'fa-virus-slash', title: 'ClamAV扫描结果', color: 'text-red-600' },
+                chkrootkit: { icon: 'fa-bug', title: 'Rootkit检查结果', color: 'text-purple-600' },
+                auditd: { icon: 'fa-clipboard-list', title: '系统审计结果', color: 'text-gray-600' },
+                lynis: { icon: 'fa-tasks', title: 'Lynis审计结果', color: 'text-teal-600' }
+            };
+
+            // 更新图标和标题
+            const info = toolInfo[toolType] || { icon: 'fa-tools', title: '工具分析结果', color: 'text-blue-600' };
+            modalIcon.className = `fas ${info.icon} text-2xl ${info.color} mr-3`;
+            modalTitle.textContent = info.title;
             
             // 模拟工具调用结果
             const results = {
                 scanner: "正在进行漏洞扫描...\n发现3个高危漏洞\n详细报告生成中...",
                 traffic: "流量分析启动...\n检测到异常连接\n正在生成流量报告...",
-                domain: "域名解析中...\n关联域名: example.com\nIP: 192.168.1.100",
-                sandbox: "样本分析中...\n行为评分: 95\n发现恶意行为特征...",
-                cloud: "云配置检查开始...\n正在扫描安全组配置...\n发现2个配置问题",
-                email: "邮件分析启动...\n提取附件中...\n完成分析，未发现恶意内容",
                 tcpdump: "正在捕获网络流量...\n发现可疑数据包\n源IP: 192.168.1.100\n目标IP: 10.0.0.1",
                 netstat: "当前网络连接统计：\n活动连接：23\n监听端口：12\n可疑连接：2",
                 ping: "正在测试网络连通性...\n目标可达\n平均响应时间：20ms",
@@ -344,13 +446,20 @@
                 lynis: "安全审计进行中...\n系统得分：82/100\n发现5个安全建议\n3个需要立即处理"
             };
             
-            toolResult.querySelector('pre').textContent = results[toolType] || "工具调用中...";
+            modalContent.textContent = results[toolType] || "工具调用中...";
         }
 
-        // 关闭工具结果
-        function closeToolResult() {
-            document.getElementById('toolResult').classList.add('hidden');
+        // 关闭弹窗
+        function closeModal() {
+            document.getElementById('toolModal').classList.add('hidden');
         }
+
+        // 点击弹窗外部关闭
+        document.getElementById('toolModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
 
         // 完成研判按钮点击事件
         document.getElementById('completeBtn').addEventListener('click', function() {
@@ -360,9 +469,19 @@
 
         // 保存到知识库按钮点击事件
         document.getElementById('saveBtn').addEventListener('click', function() {
-            // 这里添加保存到知识库的逻辑
             alert('研判结果已保存到知识库');
         });
+
+        // 后台运行
+        function runInBackground() {
+            closeModal();
+            // 这里添加后台运行的逻辑
+        }
+
+        // 停止分析
+        function stopAnalysis() {
+            // 这里添加停止分析的逻辑
+        }
     </script>
 </body>
 </html> 
