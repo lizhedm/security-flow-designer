@@ -112,7 +112,22 @@
 <body class="bg-gray-50 p-6">
     <!-- 顶部操作栏 -->
     <div class="flex justify-between items-center mb-6">
-        <h1 class="text-2xl font-bold">研判工作台</h1>
+        <div class="flex items-center space-x-4">
+            <h1 class="text-2xl font-bold">研判工作台</h1>
+            <div class="flex bg-gray-100 rounded-lg p-1 ml-4">
+                <button class="px-4 py-1 rounded-md bg-white text-sm font-medium shadow-sm">待研判</button>
+                <button class="px-4 py-1 rounded-md text-sm font-medium text-gray-600 hover:text-gray-800">已研判</button>
+            </div>
+            <div class="flex items-center space-x-2 ml-4">
+                <span class="text-sm text-gray-600">待研判：<span class="text-blue-600 font-medium">300</span> 条</span>
+                <button class="p-2 text-gray-600 hover:text-gray-800">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <button class="p-2 text-gray-600 hover:text-gray-800">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>
         <div class="flex space-x-4">
             <button id="completeBtn" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed">
                 完成研判
@@ -164,7 +179,7 @@
                         </div>
                         <div>
                             <span class="text-sm text-gray-500">所属单位：</span>
-                            <span class="text-sm">unitid-fajs24h1j3h4j</span>
+                            <span class="text-sm">UNIT-001</span>
                         </div>
                         <div>
                             <span class="text-sm text-gray-500">资产等级：</span>
@@ -178,15 +193,30 @@
                     <div class="space-y-2">
                         <div class="flex items-center space-x-2">
                             <i class="fas fa-file-alt text-gray-400"></i>
-                            <span class="text-sm text-blue-600 hover:text-blue-800 cursor-pointer">查看网络数据包</span>
+                            <span class="text-sm text-blue-600 hover:text-blue-800 cursor-pointer">网络数据包.pcap</span>
+                            <div class="flex-grow"></div>
+                            <button class="flex items-center text-sm text-blue-600 hover:text-blue-800">
+                                <i class="fas fa-plus-circle mr-1"></i>
+                                添加到研判附件
+                            </button>
                         </div>
                         <div class="flex items-center space-x-2">
                             <i class="fas fa-file-code text-gray-400"></i>
-                            <span class="text-sm text-blue-600 hover:text-blue-800 cursor-pointer">查看异常日志</span>
+                            <span class="text-sm text-blue-600 hover:text-blue-800 cursor-pointer">异常日志.log</span>
+                            <div class="flex-grow"></div>
+                            <button class="flex items-center text-sm text-blue-600 hover:text-blue-800">
+                                <i class="fas fa-plus-circle mr-1"></i>
+                                添加到研判附件
+                            </button>
                         </div>
                         <div class="flex items-center space-x-2">
                             <i class="fas fa-image text-gray-400"></i>
-                            <span class="text-sm text-blue-600 hover:text-blue-800 cursor-pointer">查看攻击截图</span>
+                            <span class="text-sm text-blue-600 hover:text-blue-800 cursor-pointer">攻击截图.png</span>
+                            <div class="flex-grow"></div>
+                            <button class="flex items-center text-sm text-blue-600 hover:text-blue-800">
+                                <i class="fas fa-plus-circle mr-1"></i>
+                                添加到研判附件
+                            </button>
                         </div>
                     </div>
                 </div>

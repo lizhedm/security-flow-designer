@@ -19,8 +19,8 @@
         <div class="flex items-center justify-between mb-4">
             <h2 class="text-lg font-semibold">筛选条件</h2>
             <div class="flex space-x-2">
-                <button class="px-3 py-1 text-sm text-blue-600 hover:bg-blue-50 rounded">保存为视图</button>
-                <button class="px-3 py-1 text-sm text-gray-600 hover:bg-gray-50 rounded">重置</button>
+                <button class="px-3 py-1 text-blue-600 hover:bg-blue-50 rounded">保存为视图</button>
+                <button class="px-3 py-1 text-gray-600 hover:bg-gray-50 rounded">重置</button>
             </div>
         </div>
         <div class="grid grid-cols-3 gap-4">
@@ -107,48 +107,234 @@
                 </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
-                <!-- 示例数据行 -->
                 <tr class="hover:bg-gray-50">
                     <td class="px-6 py-4 whitespace-nowrap">
                         <input type="checkbox" class="form-checkbox">
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">RISK-001</td>
-                    <td class="px-6 py-4 whitespace-nowrap">
+                    <td class="px-6 py-4 whitespace-nowrap">RISK-001</td>
+                    <td class="px-6 py-4">
                         <div class="flex items-center">
-                            <span class="text-sm font-medium text-gray-900">SQL注入漏洞</span>
-                            <span class="ml-2 px-2 py-1 text-xs rounded-full bg-red-100 text-red-800">0Day</span>
+                            <span class="text-sm font-medium">0day漏洞</span>
+                            <span class="ml-2 px-2 py-1 text-xs rounded-full bg-red-100 text-red-800">紧急</span>
                         </div>
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <span class="px-2 py-1 text-xs rounded-full bg-red-100 text-red-800">高危</span>
+                    <td class="px-6 py-4">
+                        <span class="px-2 py-1 text-sm rounded-full bg-red-100 text-red-800">高危</span>
                     </td>
+                    <td class="px-6 py-4">
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-red-600 h-2 rounded-full" style="width: 95%"></div>
+                        </div>
+                        <span class="text-xs text-gray-500">0.95</span>
+                    </td>
+                    <td class="px-6 py-4">UNIT-001</td>
+                    <td class="px-6 py-4">
+                        <button class="text-blue-600 hover:text-blue-800">
+                            查看 (3个)
+                        </button>
+                    </td>
+                    <td class="px-6 py-4">威胁情报</td>
+                    <td class="px-6 py-4">2024-03-15 10:30</td>
+                    <td class="px-6 py-4">
+                        <span class="px-2 py-1 text-xs rounded-full bg-yellow-100 text-yellow-800">待研判</span>
+                    </td>
+                    <td class="px-6 py-4">
+                        <div class="flex space-x-2">
+                            <button onclick="startAnalysis('RISK-001')" class="text-blue-600 hover:text-blue-800">启动研判</button>
+                            <button class="text-gray-600 hover:text-gray-800">详情</button>
+                        </div>
+                    </td>
+                </tr>
+                <tr class="hover:bg-gray-50">
                     <td class="px-6 py-4 whitespace-nowrap">
+                        <input type="checkbox" class="form-checkbox">
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">RISK-002</td>
+                    <td class="px-6 py-4">
+                        <div class="flex items-center">
+                            <span class="text-sm font-medium">SQL注入</span>
+                            <span class="ml-2 px-2 py-1 text-xs rounded-full bg-red-100 text-red-800">紧急</span>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4">
+                        <span class="px-2 py-1 text-sm rounded-full bg-red-100 text-red-800">高危</span>
+                    </td>
+                    <td class="px-6 py-4">
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-red-600 h-2 rounded-full" style="width: 90%"></div>
+                        </div>
+                        <span class="text-xs text-gray-500">0.90</span>
+                    </td>
+                    <td class="px-6 py-4">UNIT-002</td>
+                    <td class="px-6 py-4">
+                        <button class="text-blue-600 hover:text-blue-800">
+                            查看 (2个)
+                        </button>
+                    </td>
+                    <td class="px-6 py-4">安全扫描</td>
+                    <td class="px-6 py-4">2024-03-15 11:45</td>
+                    <td class="px-6 py-4">
+                        <span class="px-2 py-1 text-xs rounded-full bg-yellow-100 text-yellow-800">待研判</span>
+                    </td>
+                    <td class="px-6 py-4">
+                        <div class="flex space-x-2">
+                            <button onclick="startAnalysis('RISK-002')" class="text-blue-600 hover:text-blue-800">启动研判</button>
+                            <button class="text-gray-600 hover:text-gray-800">详情</button>
+                        </div>
+                    </td>
+                </tr>
+                <tr class="hover:bg-gray-50">
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <input type="checkbox" class="form-checkbox">
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">RISK-003</td>
+                    <td class="px-6 py-4">
+                        <div class="flex items-center">
+                            <span class="text-sm font-medium">未授权访问</span>
+                            <span class="ml-2 px-2 py-1 text-xs rounded-full bg-orange-100 text-orange-800">重要</span>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4">
+                        <span class="px-2 py-1 text-sm rounded-full bg-yellow-100 text-yellow-800">中危</span>
+                    </td>
+                    <td class="px-6 py-4">
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-yellow-600 h-2 rounded-full" style="width: 75%"></div>
+                        </div>
+                        <span class="text-xs text-gray-500">0.75</span>
+                    </td>
+                    <td class="px-6 py-4">UNIT-003</td>
+                    <td class="px-6 py-4">
+                        <button class="text-blue-600 hover:text-blue-800">
+                            查看 (1个)
+                        </button>
+                    </td>
+                    <td class="px-6 py-4">IDS告警</td>
+                    <td class="px-6 py-4">2024-03-15 14:20</td>
+                    <td class="px-6 py-4">
+                        <span class="px-2 py-1 text-xs rounded-full bg-yellow-100 text-yellow-800">待研判</span>
+                    </td>
+                    <td class="px-6 py-4">
+                        <div class="flex space-x-2">
+                            <button onclick="startAnalysis('RISK-003')" class="text-blue-600 hover:text-blue-800">启动研判</button>
+                            <button class="text-gray-600 hover:text-gray-800">详情</button>
+                        </div>
+                    </td>
+                </tr>
+                <tr class="hover:bg-gray-50">
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <input type="checkbox" class="form-checkbox">
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">RISK-004</td>
+                    <td class="px-6 py-4">
+                        <div class="flex items-center">
+                            <span class="text-sm font-medium">DDoS攻击</span>
+                            <span class="ml-2 px-2 py-1 text-xs rounded-full bg-red-100 text-red-800">紧急</span>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4">
+                        <span class="px-2 py-1 text-sm rounded-full bg-red-100 text-red-800">高危</span>
+                    </td>
+                    <td class="px-6 py-4">
                         <div class="w-full bg-gray-200 rounded-full h-2">
                             <div class="bg-red-600 h-2 rounded-full" style="width: 85%"></div>
                         </div>
                         <span class="text-xs text-gray-500">0.85</span>
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">UNIT-001</td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <button class="text-blue-600 hover:text-blue-800 text-sm">
-                            查看 (3个)
+                    <td class="px-6 py-4">UNIT-004</td>
+                    <td class="px-6 py-4">
+                        <button class="text-blue-600 hover:text-blue-800">
+                            查看 (5个)
                         </button>
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <span class="text-sm text-gray-500">威胁情报</span>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-03-15 10:30</td>
-                    <td class="px-6 py-4 whitespace-nowrap">
+                    <td class="px-6 py-4">流量监控</td>
+                    <td class="px-6 py-4">2024-03-15 16:10</td>
+                    <td class="px-6 py-4">
                         <span class="px-2 py-1 text-xs rounded-full bg-yellow-100 text-yellow-800">待研判</span>
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td class="px-6 py-4">
                         <div class="flex space-x-2">
-                            <button class="text-blue-600 hover:text-blue-800" onclick="startAnalysis('RISK-001')">启动研判</button>
+                            <button onclick="startAnalysis('RISK-004')" class="text-blue-600 hover:text-blue-800">启动研判</button>
                             <button class="text-gray-600 hover:text-gray-800">详情</button>
                         </div>
                     </td>
                 </tr>
-                <!-- 更多数据行... -->
+                <tr class="hover:bg-gray-50">
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <input type="checkbox" class="form-checkbox">
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">RISK-005</td>
+                    <td class="px-6 py-4">
+                        <div class="flex items-center">
+                            <span class="text-sm font-medium">弱口令</span>
+                            <span class="ml-2 px-2 py-1 text-xs rounded-full bg-orange-100 text-orange-800">重要</span>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4">
+                        <span class="px-2 py-1 text-sm rounded-full bg-yellow-100 text-yellow-800">中危</span>
+                    </td>
+                    <td class="px-6 py-4">
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-yellow-600 h-2 rounded-full" style="width: 70%"></div>
+                        </div>
+                        <span class="text-xs text-gray-500">0.70</span>
+                    </td>
+                    <td class="px-6 py-4">UNIT-005</td>
+                    <td class="px-6 py-4">
+                        <button class="text-blue-600 hover:text-blue-800">
+                            查看 (2个)
+                        </button>
+                    </td>
+                    <td class="px-6 py-4">安全扫描</td>
+                    <td class="px-6 py-4">2024-03-15 17:30</td>
+                    <td class="px-6 py-4">
+                        <span class="px-2 py-1 text-xs rounded-full bg-yellow-100 text-yellow-800">待研判</span>
+                    </td>
+                    <td class="px-6 py-4">
+                        <div class="flex space-x-2">
+                            <button onclick="startAnalysis('RISK-005')" class="text-blue-600 hover:text-blue-800">启动研判</button>
+                            <button class="text-gray-600 hover:text-gray-800">详情</button>
+                        </div>
+                    </td>
+                </tr>
+                <tr class="hover:bg-gray-50">
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <input type="checkbox" class="form-checkbox">
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">RISK-006</td>
+                    <td class="px-6 py-4">
+                        <div class="flex items-center">
+                            <span class="text-sm font-medium">配置错误</span>
+                            <span class="ml-2 px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800">普通</span>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4">
+                        <span class="px-2 py-1 text-sm rounded-full bg-blue-100 text-blue-800">低危</span>
+                    </td>
+                    <td class="px-6 py-4">
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-blue-600 h-2 rounded-full" style="width: 45%"></div>
+                        </div>
+                        <span class="text-xs text-gray-500">0.45</span>
+                    </td>
+                    <td class="px-6 py-4">UNIT-006</td>
+                    <td class="px-6 py-4">
+                        <button class="text-blue-600 hover:text-blue-800">
+                            查看 (1个)
+                        </button>
+                    </td>
+                    <td class="px-6 py-4">配置审计</td>
+                    <td class="px-6 py-4">2024-03-15 18:45</td>
+                    <td class="px-6 py-4">
+                        <span class="px-2 py-1 text-xs rounded-full bg-yellow-100 text-yellow-800">待研判</span>
+                    </td>
+                    <td class="px-6 py-4">
+                        <div class="flex space-x-2">
+                            <button onclick="startAnalysis('RISK-006')" class="text-blue-600 hover:text-blue-800">启动研判</button>
+                            <button class="text-gray-600 hover:text-gray-800">详情</button>
+                        </div>
+                    </td>
+                </tr>
             </tbody>
         </table>
     </div>
@@ -167,12 +353,66 @@
         </div>
     </div>
 
+    <!-- 启动研判弹窗 -->
+    <div id="startAnalysisModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg shadow-xl w-[500px]">
+            <div class="flex justify-between items-center p-6 border-b">
+                <h3 class="text-lg font-medium">启动研判</h3>
+                <button onclick="closeStartAnalysisModal()" class="text-gray-400 hover:text-gray-500">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="p-6 space-y-4">
+                <div class="flex items-center justify-between">
+                    <span class="text-sm text-gray-700">拆解任务</span>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="splitTaskSwitch" class="sr-only peer" onchange="toggleSplitTask()">
+                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                    </label>
+                </div>
+                <div class="space-y-2">
+                    <span class="text-sm text-gray-700">工单号</span>
+                    <input type="text" value="WO-2024031501" class="w-full px-3 py-2 border rounded-lg bg-gray-50" readonly>
+                </div>
+                <div id="splitTaskOptions" class="space-y-2 hidden">
+                    <span class="text-sm text-gray-700">拆解方式</span>
+                    <select class="w-full px-3 py-2 border rounded-lg">
+                        <option value="receiver">按接受方</option>
+                        <option value="region">按区办地域</option>
+                    </select>
+                </div>
+            </div>
+            <div class="flex justify-end p-6 border-t bg-gray-50">
+                <button onclick="confirmStartAnalysis()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                    确定
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script>
         // 启动研判
         function startAnalysis(riskId) {
-            // 将风险ID存储到 sessionStorage
             sessionStorage.setItem('currentRiskId', riskId);
-            // 跳转到研判工作台
+            document.getElementById('startAnalysisModal').classList.remove('hidden');
+        }
+
+        // 关闭弹窗
+        function closeStartAnalysisModal() {
+            document.getElementById('startAnalysisModal').classList.add('hidden');
+        }
+
+        // 切换拆解任务选项
+        function toggleSplitTask() {
+            const splitTaskOptions = document.getElementById('splitTaskOptions');
+            const isChecked = document.getElementById('splitTaskSwitch').checked;
+            splitTaskOptions.classList.toggle('hidden', !isChecked);
+        }
+
+        // 确认启动研判
+        function confirmStartAnalysis() {
+            const riskId = sessionStorage.getItem('currentRiskId');
+            closeStartAnalysisModal();
             window.parent.loadPage('analysis-workbench');
         }
     </script>
