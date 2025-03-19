@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>研判工单</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .overflow-x-auto {
+            scrollbar-width: thin;
+            scrollbar-color: #CBD5E0 #EDF2F7;
+        }
+        .overflow-x-auto::-webkit-scrollbar {
+            height: 8px;
+        }
+        .overflow-x-auto::-webkit-scrollbar-track {
+            background: #EDF2F7;
+        }
+        .overflow-x-auto::-webkit-scrollbar-thumb {
+            background-color: #CBD5E0;
+            border-radius: 4px;
+        }
+        tr:hover td.sticky {
+            background-color: #F9FAFB !important;
+        }
+        .sticky.left-0 {
+            box-shadow: 2px 0 4px -2px rgba(0, 0, 0, 0.1);
+        }
+        .sticky.right-0 {
+            box-shadow: -2px 0 4px -2px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 p-6">
+    <div class="mb-6">
+        <h1 class="text-2xl font-bold mb-4">研判工单</h1>
+        
+        <!-- 筛选条件 -->
+        <div class="bg-white rounded-xl shadow-sm p-4 mb-6">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-lg font-semibold text-gray-900">筛选条件</h2>
+                <div class="flex space-x-2">
+                    <button class="px-3 py-1.5 text-sm text-blue-600 hover:bg-blue-50 rounded-lg transition-colors duration-200">
+                        <i class="fas fa-save mr-1"></i>保存筛选
+                    </button>
+                    <button class="px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-50 rounded-lg transition-colors duration-200">
+                        <i class="fas fa-undo mr-1"></i>重置
+                    </button>
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-12 gap-4">
+                <!-- 搜索框 -->
+                <div class="col-span-12 lg:col-span-4">
+                    <div class="relative">
+                        <input type="text" placeholder="搜索工单ID或风险ID..." 
+                            class="w-full pl-8 pr-4 py-1.5 text-sm border border-gray-300 rounded-lg focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
+                        <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm"></i>
+                    </div>
+                </div>
+
+                <!-- 接收方 -->
+                <div class="col-span-6 lg:col-span-2">
+                    <select class="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
+                        <option value="">接收方（全部）</option>
+                        <option value="斗象">斗象</option>
+                        <option value="观安">观安</option>
+                        <option value="其他">其他</option>
+                    </select>
+                </div>
+
+                <!-- 时间范围 -->
+                <div class="col-span-6 lg:col-span-2">
+                    <input type="date" placeholder="开始时间" class="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
+                </div>
+
+                <div class="col-span-6 lg:col-span-2">
+                    <input type="date" placeholder="结束时间" class="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
+                </div>
+
+                <div class="col-span-6 lg:col-span-2">
+                    <button class="w-full px-4 py-1.5 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200">
+                        <i class="fas fa-search mr-1"></i>查询
+                    </button>
+                </div>
+            </div>
+
+            <div class="flex flex-wrap gap-2 mt-3 pt-3 border-t">
+                <!-- 工单状态 -->
+                <div class="flex items-center space-x-2">
+                    <span class="text-sm text-gray-500">工单状态：</span>
+                    <div class="flex gap-2">
+                        <label class="inline-flex items-center px-2 py-1 bg-white border rounded-lg cursor-pointer hover:bg-gray-50">
+                            <input type="checkbox" class="form-checkbox text-blue-600 rounded h-3 w-3">
+                            <span class="ml-1.5 text-sm">待处理</span>
+                        </label>
+                        <label class="inline-flex items-center px-2 py-1 bg-white border rounded-lg cursor-pointer hover:bg-gray-50">
+                            <input type="checkbox" class="form-checkbox text-blue-600 rounded h-3 w-3">
+                            <span class="ml-1.5 text-sm">处理中</span>
+                        </label>
+                        <label class="inline-flex items-center px-2 py-1 bg-white border rounded-lg cursor-pointer hover:bg-gray-50">
+                            <input type="checkbox" class="form-checkbox text-blue-600 rounded h-3 w-3">
+                            <span class="ml-1.5 text-sm">已完成</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- 优先级 -->
+                <div class="flex items-center space-x-2 ml-6">
+                    <span class="text-sm text-gray-500">优先级：</span>
+                    <div class="flex gap-2">
+                        <label class="inline-flex items-center px-2 py-1 bg-white border rounded-lg cursor-pointer hover:bg-gray-50">
+                            <input type="checkbox" class="form-checkbox text-blue-600 rounded h-3 w-3">
+                            <span class="ml-1.5 text-sm">重要紧急</span>
+                        </label>
+                        <label class="inline-flex items-center px-2 py-1 bg-white border rounded-lg cursor-pointer hover:bg-gray-50">
+                            <input type="checkbox" class="form-checkbox text-blue-600 rounded h-3 w-3">
+                            <span class="ml-1.5 text-sm">高</span>
+                        </label>
+                        <label class="inline-flex items-center px-2 py-1 bg-white border rounded-lg cursor-pointer hover:bg-gray-50">
+                            <input type="checkbox" class="form-checkbox text-blue-600 rounded h-3 w-3">
+                            <span class="ml-1.5 text-sm">中</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 工具栏 -->
+        <div class="flex justify-between items-center mb-4">
+            <div class="flex space-x-2">
+                <button class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                    <i class="fas fa-plus mr-2"></i>新建工单
+                </button>
+                <button class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
+                    <i class="fas fa-download mr-2"></i>导出
+                </button>
+            </div>
+            <div class="flex items-center space-x-4">
+                <span class="text-sm text-gray-500">共 5 条记录</span>
+                <button class="px-3 py-1 text-sm border border-gray-300 rounded hover:bg-gray-50">
+                    <i class="fas fa-sync-alt mr-1"></i>刷新
+                </button>
+            </div>
+        </div>
+
+        <!-- 工单列表 -->
+        <div class="bg-white rounded-lg shadow-sm relative">
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead>
+                        <tr class="bg-gray-50">
+                            <th class="sticky left-0 z-10 bg-gray-50 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-r">
+                                工单ID
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">关联风险</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">优先级</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">接收方</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">处置人</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">创建时间</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">更新时间</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">状态</th>
+                            <th class="sticky right-0 z-10 bg-gray-50 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-l">
+                                操作
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        <tr class="hover:bg-gray-50">
+                            <td class="sticky left-0 z-10 bg-white px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 border-r">
+                                TASK-001
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-blue-600">
+                                <a href="#" class="hover:text-blue-800">RISK-001</a>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2 py-1 text-xs rounded-full bg-red-100 text-red-800">高</span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">斗象</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">张三</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-03-15 10:30</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-03-15 14:20</td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2 py-1 text-xs rounded-full bg-yellow-100 text-yellow-800">处理中</span>
+                            </td>
+                            <td class="sticky right-0 z-10 bg-white px-6 py-4 whitespace-nowrap text-sm border-l">
+                                <div class="flex space-x-2">
+                                    <button class="text-blue-600 hover:text-blue-800">研判</button>
+                                    <button class="text-blue-600 hover:text-blue-800">重新派发</button>
+                                    <button class="text-blue-600 hover:text-blue-800">详情</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="hover:bg-gray-50">
+                            <td class="sticky left-0 z-10 bg-white px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 border-r">
+                                TASK-002
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-blue-600">
+                                <a href="#" class="hover:text-blue-800">RISK-002</a>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2 py-1 text-xs rounded-full bg-orange-100 text-orange-800">中</span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">观安</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">李四</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-03-15 11:30</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-03-15 15:20</td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">已完成</span>
+                            </td>
+                            <td class="sticky right-0 z-10 bg-white px-6 py-4 whitespace-nowrap text-sm border-l">
+                                <div class="flex space-x-2">
+                                    <button class="text-blue-600 hover:text-blue-800">研判</button>
+                                    <button class="text-blue-600 hover:text-blue-800">重新派发</button>
+                                    <button class="text-blue-600 hover:text-blue-800">详情</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <!-- 添加新的工单数据 -->
+                        <tr class="hover:bg-gray-50">
+                            <td class="sticky left-0 z-10 bg-white px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 border-r">
+                                TASK-003
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-blue-600">
+                                <a href="#" class="hover:text-blue-800">RISK-003</a>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2 py-1 text-xs rounded-full bg-red-100 text-red-800">高</span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">斗象</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">王五</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-03-15 13:30</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-03-15 16:20</td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2 py-1 text-xs rounded-full bg-yellow-100 text-yellow-800">处理中</span>
+                            </td>
+                            <td class="sticky right-0 z-10 bg-white px-6 py-4 whitespace-nowrap text-sm border-l">
+                                <div class="flex space-x-2">
+                                    <button class="text-blue-600 hover:text-blue-800">研判</button>
+                                    <button class="text-blue-600 hover:text-blue-800">重新派发</button>
+                                    <button class="text-blue-600 hover:text-blue-800">详情</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="hover:bg-gray-50">
+                            <td class="sticky left-0 z-10 bg-white px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 border-r">
+                                TASK-004
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-blue-600">
+                                <a href="#" class="hover:text-blue-800">RISK-004</a>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2 py-1 text-xs rounded-full bg-orange-100 text-orange-800">中</span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">观安</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">赵六</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-03-15 14:30</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-03-15 17:20</td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">已完成</span>
+                            </td>
+                            <td class="sticky right-0 z-10 bg-white px-6 py-4 whitespace-nowrap text-sm border-l">
+                                <div class="flex space-x-2">
+                                    <button class="text-blue-600 hover:text-blue-800">研判</button>
+                                    <button class="text-blue-600 hover:text-blue-800">重新派发</button>
+                                    <button class="text-blue-600 hover:text-blue-800">详情</button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 分页 -->
+        <div class="flex justify-between items-center mt-4">
+            <div class="text-sm text-gray-500">
+                显示 1-5 条，共 5 条
+            </div>
+            <div class="flex space-x-2">
+                <button class="px-3 py-1 border rounded hover:bg-gray-50 disabled:opacity-50" disabled>上一页</button>
+                <button class="px-3 py-1 border rounded bg-blue-600 text-white">1</button>
+                <button class="px-3 py-1 border rounded hover:bg-gray-50 disabled:opacity-50" disabled>下一页</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 强制关闭弹窗 -->
+    <div id="closeModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
+        <div class="bg-white rounded-lg shadow-xl w-[500px]">
+            <div class="flex justify-between items-center p-6 border-b">
+                <h3 class="text-lg font-medium">强制关闭工单</h3>
+                <button class="text-gray-400 hover:text-gray-500">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="p-6">
+                <div class="space-y-4">
+                    <div class="space-y-2">
+                        <label class="text-sm text-gray-700">关闭原因</label>
+                        <select class="w-full px-3 py-2 border rounded-lg">
+                            <option>误报</option>
+                            <option>重复工单</option>
+                            <option>其他原因</option>
+                        </select>
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-sm text-gray-700">备注说明</label>
+                        <textarea class="w-full px-3 py-2 border rounded-lg" rows="3"></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="flex justify-end p-6 border-t bg-gray-50">
+                <button class="px-4 py-2 text-gray-600 hover:text-gray-800 mr-2">取消</button>
+                <button class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">确认关闭</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html> 

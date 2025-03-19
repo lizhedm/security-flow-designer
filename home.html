@@ -80,6 +80,7 @@
                 </a>
                 <div id="analysis-submenu" class="hidden pl-6">
                     <a href="#" class="subnav-item block px-6 py-2" onclick="loadPage('risk-list')">风险列表</a>
+                    <a href="#" class="subnav-item block px-6 py-2" onclick="loadPage('task-list')">研判工单</a>
                     <a href="#" class="subnav-item block px-6 py-2" onclick="loadPage('analysis-workbench')">研判工作台</a>
                 </div>
                 <a href="#" class="subnav-item block px-6 py-2" onclick="loadPage('flows')">流程管理</a>
@@ -130,7 +131,7 @@
             // 加载默认页面
             const defaultPages = {
                 'business': 'risk-warning',
-                'risk': 'risk-analysis',
+                'risk': 'risk-list',
                 'asset': 'asset-search',
                 'intelligence': 'intelligence-search',
                 'support': 'unit-management'
@@ -157,17 +158,94 @@
 
         // 修改 loadPage 函数
         function loadPage(page) {
-            // 更新子菜单样式
-            document.querySelectorAll('.subnav-item').forEach(item => {
-                if (item.getAttribute('onclick').includes(page)) {
-                    item.classList.add('active');
-                } else {
-                    item.classList.remove('active');
-                }
-            });
-
-            // 加载对应页面
+            // 更新页面内容
             document.getElementById('content-frame').src = `pages/${page}.html`;
+            
+            // 更新导航状态
+            updateNavigation(page);
+        }
+
+        function updateNavigation(page) {
+            // 页面与导航的映射关系
+            const pageNavMapping = {
+                // 业务中心
+                'risk-warning': { nav: 'business', subnav: 'risk-warning' },
+                'info-notification': { nav: 'business', subnav: 'info-notification' },
+                'self-report': { nav: 'business', subnav: 'self-report' },
+                'emergency-handle': { nav: 'business', subnav: 'emergency-handle' },
+                'plan-management': { nav: 'business', subnav: 'plan-management' },
+                'collaborative-handle': { nav: 'business', subnav: 'collaborative-handle' },
+                'incident-report': { nav: 'business', subnav: 'incident-report' },
+                
+                // 风险研判
+                'risk-list': { nav: 'risk', subnav: 'risk-list', parent: 'analysis-submenu' },
+                'task-list': { nav: 'risk', subnav: 'task-list', parent: 'analysis-submenu' },
+                'analysis-workbench': { nav: 'risk', subnav: 'analysis-workbench', parent: 'analysis-submenu' },
+                'flows': { nav: 'risk', subnav: 'flows' },
+                
+                // 资产汇聚
+                'asset-search': { nav: 'asset', subnav: 'asset-search' },
+                
+                // 情报库
+                'intelligence-search': { nav: 'intelligence', subnav: 'intelligence-search' },
+                'intelligence-statistics': { nav: 'intelligence', subnav: 'intelligence-statistics' },
+                'threat-intelligence': { nav: 'intelligence', subnav: 'threat-intelligence' },
+                'feature-intelligence': { nav: 'intelligence', subnav: 'feature-intelligence' },
+                'intelligence-knowledge': { nav: 'intelligence', subnav: 'intelligence-knowledge' },
+                
+                // 支撑单位管理
+                'unit-management': { nav: 'support', subnav: 'unit-management' },
+                'unit-assessment': { nav: 'support', subnav: 'unit-assessment' },
+                'assessment-rules': { nav: 'support', subnav: 'assessment-rules' }
+            };
+
+            const mapping = pageNavMapping[page];
+            if (!mapping) return;
+
+            // 1. 更新顶部导航
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            const topNav = document.querySelector(`.nav-item[onclick="switchNav('${mapping.nav}')"]`);
+            if (topNav) {
+                topNav.classList.add('active');
+            }
+
+            // 2. 显示对应的左侧菜单
+            document.querySelectorAll('[id$="-menu"]').forEach(menu => {
+                menu.classList.add('hidden');
+            });
+            const sideMenu = document.getElementById(`${mapping.nav}-menu`);
+            if (sideMenu) {
+                sideMenu.classList.remove('hidden');
+            }
+
+            // 3. 如果有父级菜单（如研判分析下的子项），展开它
+            if (mapping.parent) {
+                const parentMenu = document.getElementById(mapping.parent);
+                if (parentMenu) {
+                    parentMenu.classList.remove('hidden');
+                    const parentToggle = parentMenu.previousElementSibling;
+                    if (parentToggle) {
+                        const arrow = parentToggle.querySelector('i');
+                        arrow.classList.remove('fa-chevron-down');
+                        arrow.classList.add('fa-chevron-up');
+                        parentToggle.classList.add('active');
+                    }
+                }
+            }
+
+            // 4. 更新子导航项的选中状态
+            document.querySelectorAll('.subnav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            const subNav = Array.from(document.querySelectorAll('.subnav-item')).find(item => 
+                item.getAttribute('onclick')?.includes(`'${mapping.subnav}'`) ||
+                item.getAttribute('onclick')?.includes(`"${mapping.subnav}"`)
+            );
+            if (subNav) {
+                subNav.classList.add('active');
+            }
         }
 
         // 用户下拉菜单切换
@@ -183,6 +261,13 @@
             
             if (!button) {
                 dropdown.classList.add('hidden');
+            }
+        });
+
+        // 添加消息监听器
+        window.addEventListener('message', function(event) {
+            if (event.data.type === 'navigation') {
+                loadPage(event.data.page);
             }
         });
     </script>

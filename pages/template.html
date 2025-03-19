@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>页面开发中</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .card {
+            transition: all 0.3s ease;
+            border: 1px solid #e5e7eb;
+        }
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 20px -10px rgba(0, 0, 0, 0.1);
+            border-color: #3b82f6;
+        }
+        .icon-wrapper {
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #EBF5FF 0%, #E1EFFE 100%);
+            margin-right: 16px;
+        }
+        .icon-wrapper i {
+            font-size: 24px;
+            background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div class="min-h-screen flex flex-col items-center justify-center p-6">
+        <div class="text-center mb-12">
+            <div class="w-20 h-20 mx-auto mb-6 rounded-full bg-blue-100 flex items-center justify-center">
+                <i class="fas fa-code text-5xl bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent"></i>
+            </div>
+            <h1 class="text-3xl font-bold text-gray-800 mb-3">原型设计中</h1>
+            <p class="text-gray-600 text-lg">该页面原型正在设计中，请先查看下列已完成的原型页面</p>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl w-full mb-12">
+            <!-- 风险列表卡片 -->
+            <a href="#" class="card rounded-xl p-6 bg-white hover:bg-gray-50" onclick="navigateTo('risk-list')">
+                <div class="flex items-center">
+                    <div class="icon-wrapper">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-semibold text-gray-900 mb-2">风险列表</h3>
+                        <p class="text-gray-600">查看和管理所有风险项</p>
+                    </div>
+                </div>
+            </a>
+
+            <!-- 研判工作台卡片 -->
+            <a href="#" class="card rounded-xl p-6 bg-white hover:bg-gray-50" onclick="navigateTo('analysis-workbench')">
+                <div class="flex items-center">
+                    <div class="icon-wrapper">
+                        <i class="fas fa-desktop"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-semibold text-gray-900 mb-2">研判工作台</h3>
+                        <p class="text-gray-600">进行风险研判和分析</p>
+                    </div>
+                </div>
+            </a>
+
+            <!-- 流程管理卡片 -->
+            <a href="#" class="card rounded-xl p-6 bg-white hover:bg-gray-50" onclick="navigateTo('flows')">
+                <div class="flex items-center">
+                    <div class="icon-wrapper">
+                        <i class="fas fa-project-diagram"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-semibold text-gray-900 mb-2">流程管理</h3>
+                        <p class="text-gray-600">管理和配置工作流程</p>
+                    </div>
+                </div>
+            </a>
+
+             <!-- 流程编辑卡片 -->
+             <a href="#" class="card rounded-xl p-6 bg-white hover:bg-gray-50" onclick="navigateTo('flow-editor')">
+                <div class="flex items-center">
+                    <div class="icon-wrapper">
+                        <i class="fas fa-edit"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-semibold text-gray-900 mb-2">流程编辑</h3>
+                        <p class="text-gray-600">自定义工作流程</p>
+                    </div>
+                </div>
+            </a>
+
+             <!-- 研判工单卡片 -->
+             <a href="#" class="card rounded-xl p-6 bg-white hover:bg-gray-50" onclick="navigateTo('task-list')">
+                <div class="flex items-center">
+                    <div class="icon-wrapper">
+                        <i class="fas fa-file-alt"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-semibold text-gray-900 mb-2">研判工单</h3>
+                        <p class="text-gray-600">查看研判工单</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <div class="text-center text-gray-500 text-base">
+            <i class="fas fa-tools mr-2"></i>更多原型正在赶工设计中...
+        </div>
+    </div>
+
+    <script>
+        function navigateTo(page) {
+            // 向父窗口发送消息
+            window.parent.postMessage({
+                type: 'navigation',
+                page: page
+            }, '*');
+        }
+    </script>
+</body>
+</html> 

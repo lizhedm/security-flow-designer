@@ -8,78 +8,45 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="assets/css/main.css" rel="stylesheet">
 </head>
-<body class="bg-gray-100">
-    <div class="flex h-screen">
-        <!-- 侧边栏 -->
-        <div class="w-64 bg-gray-900 text-white">
-            <div class="p-4">
-                <h1 class="text-xl font-bold">网络安全共享研判系统</h1>
-            </div>
-            <nav class="mt-4">
-                <a href="pages/flows.html" target="mainContent" class="flex items-center px-4 py-3 hover:bg-gray-800">
-                    <i class="fas fa-project-diagram w-6"></i>
-                    <span>流程管理</span>
-                </a>
-            </nav>
+<body class="h-screen flex">
+    <!-- 侧边栏 -->
+    <div class="w-64 bg-gray-900 text-white">
+        <div class="p-4">
+            <h1 class="text-xl font-bold">网络安全共享研判系统</h1>
         </div>
+        <nav class="mt-4">
+            <div class="px-4 py-2 text-gray-400 uppercase text-xs font-semibold">研判分析</div>
+            <a href="javascript:void(0)" onclick="loadPage('risk-list')" class="flex items-center px-4 py-3 hover:bg-gray-800">
+                <i class="fas fa-shield-alt w-6"></i>
+                <span>风险列表</span>
+            </a>
+            <a href="javascript:void(0)" onclick="loadPage('task-list')" class="flex items-center px-4 py-3 hover:bg-gray-800">
+                <i class="fas fa-tasks w-6"></i>
+                <span>研判工单</span>
+            </a>
+            <a href="javascript:void(0)" onclick="loadPage('analysis-workbench')" class="flex items-center px-4 py-3 hover:bg-gray-800">
+                <i class="fas fa-desktop w-6"></i>
+                <span>研判工作台</span>
+            </a>
+            <div class="px-4 py-2 text-gray-400 uppercase text-xs font-semibold mt-4">流程管理</div>
+            <a href="javascript:void(0)" onclick="loadPage('flow-management')" class="flex items-center px-4 py-3 hover:bg-gray-800">
+                <i class="fas fa-project-diagram w-6"></i>
+                <span>流程管理</span>
+            </a>
+        </nav>
+    </div>
 
-        <!-- 主内容区 -->
-        <div class="flex-1 flex flex-col">
-            <!-- 顶部导航栏 -->
-            <header class="bg-white shadow-sm h-16 flex items-center px-6">
-                <div class="ml-auto flex items-center space-x-4">
-                    <div class="relative">
-                        <button class="flex items-center space-x-3 hover:bg-gray-50 rounded-lg px-3 py-2" onclick="toggleUserDropdown()">
-                            <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-                                alt="用户头像"
-                                class="h-8 w-8 rounded-full">
-                            <span class="text-gray-700">admin</span>
-                            <i class="fas fa-chevron-down text-gray-400"></i>
-                        </button>
-                        <div id="userDropdown" class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg hidden z-50">
-                            <div class="py-1">
-                                <a href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                    <i class="fas fa-user mr-3 w-4 text-gray-400"></i>
-                                    账户信息
-                                </a>
-                                <a href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                    <i class="fas fa-key mr-3 w-4 text-gray-400"></i>
-                                    修改密码
-                                </a>
-                                <div class="border-t border-gray-100"></div>
-                                <a href="#" class="flex items-center px-4 py-2 text-sm text-red-600 hover:bg-gray-100">
-                                    <i class="fas fa-sign-out-alt mr-3 w-4"></i>
-                                    退出登录
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </header>
-
-            <!-- iframe 内容区 -->
-            <main class="flex-1 p-6">
-                <iframe name="mainContent" src="pages/flows.html" class="w-full h-full rounded-lg bg-white shadow-sm"></iframe>
-            </main>
-        </div>
+    <!-- 主内容区 -->
+    <div class="flex-1">
+        <iframe id="mainContent" name="mainContent" src="pages/risk-list.html" class="w-full h-full border-none"></iframe>
     </div>
 
     <script>
-        // 用户下拉菜单切换
-        function toggleUserDropdown() {
-            const dropdown = document.getElementById('userDropdown');
-            dropdown.classList.toggle('hidden');
-        }
-
-        // 点击其他地方关闭下拉菜单
-        document.addEventListener('click', (e) => {
-            const dropdown = document.getElementById('userDropdown');
-            const button = e.target.closest('button[onclick="toggleUserDropdown()"]');
-            
-            if (!button) {
-                dropdown.classList.add('hidden');
-            }
-        });
+        // 全局函数，供iframe内部调用
+        window.loadPage = function(page) {
+            const iframe = document.getElementById('mainContent');
+            iframe.src = `pages/${page}.html`;
+        };
     </script>
 </body>
 </html> 
