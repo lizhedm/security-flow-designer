@@ -363,16 +363,23 @@
                 </button>
             </div>
             <div class="p-6 space-y-4">
+                <div class="space-y-2">
+                    <span class="text-sm text-gray-700">工单号</span>
+                    <input type="text" value="WO-2024031501" class="w-full px-3 py-2 border rounded-lg bg-gray-50" readonly>
+                </div>
+                <div class="space-y-2">
+                    <span class="text-sm text-gray-700">处置人</span>
+                    <select class="w-full px-3 py-2 border rounded-lg">
+                        <option value="receiver">张三</option>
+                        <option value="region">李四</option>
+                    </select>
+                </div>
                 <div class="flex items-center justify-between">
                     <span class="text-sm text-gray-700">拆解任务</span>
                     <label class="relative inline-flex items-center cursor-pointer">
                         <input type="checkbox" id="splitTaskSwitch" class="sr-only peer" onchange="toggleSplitTask()">
                         <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
                     </label>
-                </div>
-                <div class="space-y-2">
-                    <span class="text-sm text-gray-700">工单号</span>
-                    <input type="text" value="WO-2024031501" class="w-full px-3 py-2 border rounded-lg bg-gray-50" readonly>
                 </div>
                 <div id="splitTaskOptions" class="space-y-2 hidden">
                     <span class="text-sm text-gray-700">拆解方式</span>
