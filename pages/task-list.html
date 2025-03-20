@@ -88,6 +88,7 @@
 
             <div class="flex flex-wrap gap-2 mt-3 pt-3 border-t">
                 <!-- 工单状态 -->
+                <!-- 待处理、研判中、已反馈（研判人员有反馈，需应急中心回复）、已验证（研判人员完成研判，等待应急中心确认）、已归档（应急中心已确认并结束工单）、已撤回（应急中心撤回工单） -->
                 <div class="flex items-center space-x-2">
                     <span class="text-sm text-gray-500">工单状态：</span>
                     <div class="flex gap-2">
@@ -97,11 +98,23 @@
                         </label>
                         <label class="inline-flex items-center px-2 py-1 bg-white border rounded-lg cursor-pointer hover:bg-gray-50">
                             <input type="checkbox" class="form-checkbox text-blue-600 rounded h-3 w-3">
-                            <span class="ml-1.5 text-sm">处理中</span>
+                            <span class="ml-1.5 text-sm">研判中</span>
                         </label>
                         <label class="inline-flex items-center px-2 py-1 bg-white border rounded-lg cursor-pointer hover:bg-gray-50">
                             <input type="checkbox" class="form-checkbox text-blue-600 rounded h-3 w-3">
-                            <span class="ml-1.5 text-sm">已完成</span>
+                            <span class="ml-1.5 text-sm">已反馈</span>
+                        </label>
+                        <label class="inline-flex items-center px-2 py-1 bg-white border rounded-lg cursor-pointer hover:bg-gray-50">
+                            <input type="checkbox" class="form-checkbox text-blue-600 rounded h-3 w-3">
+                            <span class="ml-1.5 text-sm">已验证</span>
+                        </label>
+                        <label class="inline-flex items-center px-2 py-1 bg-white border rounded-lg cursor-pointer hover:bg-gray-50">
+                            <input type="checkbox" class="form-checkbox text-blue-600 rounded h-3 w-3">
+                            <span class="ml-1.5 text-sm">已归档</span>
+                        </label>
+                        <label class="inline-flex items-center px-2 py-1 bg-white border rounded-lg cursor-pointer hover:bg-gray-50">
+                            <input type="checkbox" class="form-checkbox text-blue-600 rounded h-3 w-3">
+                            <span class="ml-1.5 text-sm">已撤回</span>
                         </label>
                     </div>
                 </div>
@@ -121,6 +134,10 @@
                         <label class="inline-flex items-center px-2 py-1 bg-white border rounded-lg cursor-pointer hover:bg-gray-50">
                             <input type="checkbox" class="form-checkbox text-blue-600 rounded h-3 w-3">
                             <span class="ml-1.5 text-sm">中</span>
+                        </label>
+                        <label class="inline-flex items-center px-2 py-1 bg-white border rounded-lg cursor-pointer hover:bg-gray-50">
+                            <input type="checkbox" class="form-checkbox text-blue-600 rounded h-3 w-3">
+                            <span class="ml-1.5 text-sm">低</span>
                         </label>
                     </div>
                 </div>
@@ -188,7 +205,7 @@
                                 <div class="flex space-x-2">
                                     <button class="text-blue-600 hover:text-blue-800">研判</button>
                                     <button class="text-blue-600 hover:text-blue-800">重新派发</button>
-                                    <button class="text-blue-600 hover:text-blue-800">详情</button>
+                                    <button onclick="navigateTo('work-order-detail')" class="text-blue-600 hover:text-blue-800">详情</button>
                                 </div>
                             </td>
                         </tr>
@@ -213,7 +230,7 @@
                                 <div class="flex space-x-2">
                                     <button class="text-blue-600 hover:text-blue-800">研判</button>
                                     <button class="text-blue-600 hover:text-blue-800">重新派发</button>
-                                    <button class="text-blue-600 hover:text-blue-800">详情</button>
+                                    <button onclick="navigateTo('work-order-detail')" class="text-blue-600 hover:text-blue-800">详情</button>
                                 </div>
                             </td>
                         </tr>
@@ -239,7 +256,7 @@
                                 <div class="flex space-x-2">
                                     <button class="text-blue-600 hover:text-blue-800">研判</button>
                                     <button class="text-blue-600 hover:text-blue-800">重新派发</button>
-                                    <button class="text-blue-600 hover:text-blue-800">详情</button>
+                                    <button onclick="navigateTo('work-order-detail')" class="text-blue-600 hover:text-blue-800">详情</button>
                                 </div>
                             </td>
                         </tr>
@@ -264,7 +281,7 @@
                                 <div class="flex space-x-2">
                                     <button class="text-blue-600 hover:text-blue-800">研判</button>
                                     <button class="text-blue-600 hover:text-blue-800">重新派发</button>
-                                    <button class="text-blue-600 hover:text-blue-800">详情</button>
+                                    <button onclick="navigateTo('work-order-detail')" class="text-blue-600 hover:text-blue-800">详情</button>
                                 </div>
                             </td>
                         </tr>
@@ -276,12 +293,14 @@
         <!-- 分页 -->
         <div class="flex justify-between items-center mt-4">
             <div class="text-sm text-gray-500">
-                显示 1-5 条，共 5 条
+                显示 1-4 条，共 4 条
             </div>
             <div class="flex space-x-2">
-                <button class="px-3 py-1 border rounded hover:bg-gray-50 disabled:opacity-50" disabled>上一页</button>
+                <button class="px-3 py-1 border rounded hover:bg-gray-50">&lt;</button>
                 <button class="px-3 py-1 border rounded bg-blue-600 text-white">1</button>
-                <button class="px-3 py-1 border rounded hover:bg-gray-50 disabled:opacity-50" disabled>下一页</button>
+                <button class="px-3 py-1 border rounded hover:bg-gray-50">2</button>
+                <button class="px-3 py-1 border rounded hover:bg-gray-50">3</button>
+                <button class="px-3 py-1 border rounded hover:bg-gray-50">&gt;</button>
             </div>
         </div>
     </div>
@@ -317,5 +336,23 @@
             </div>
         </div>
     </div>
+
+    <script>
+        // 添加消息监听器，接收来自template.html的消息并转发给home.html
+        window.addEventListener('message', function(event) {
+            // 转发消息给顶层窗口
+            if (event.data.type === 'navigation') {
+                window.parent.postMessage(event.data, '*');
+            }
+        });
+
+        function navigateTo(page) {
+            // 向父窗口发送消息
+            window.parent.postMessage({
+                type: 'navigation',
+                page: page
+            }, '*');
+        }
+    </script>
 </body>
 </html> 
