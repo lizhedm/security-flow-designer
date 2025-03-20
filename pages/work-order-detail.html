@@ -29,7 +29,11 @@
                         </div>
                         <div class="flex items-center space-x-2">
                             <span class="text-sm text-gray-500">接收方：</span>
-                            <span class="text-sm text-gray-900">斗象安全</span>
+                            <span class="text-sm text-gray-900">斗象</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <span class="text-sm text-gray-500">当前处理人：</span>
+                            <span class="text-sm text-gray-900">张三</span>
                         </div>
                     </div>
                     <div class="flex items-center space-x-6 text-sm text-gray-500">
@@ -70,7 +74,7 @@
                                 <div class="ml-12">
                                     <div class="text-sm font-medium text-gray-900">工单创建</div>
                                     <div class="text-xs text-gray-500">2024-03-21 10:30:00</div>
-                                    <div class="text-sm text-gray-600 mt-1">系统自动创建工单</div>
+                                    <div class="text-sm text-gray-600 mt-1">李微(斗象) 创建工单</div>
                                 </div>
                             </div>
                             <div class="relative">
@@ -81,7 +85,7 @@
                                     <div class="text-sm font-medium text-gray-900">分配处理人</div>
                                     <div class="text-xs text-gray-500">2024-03-21 10:35:00</div>
                                     <div class="text-sm text-gray-600 mt-1">
-                                        分配给：张三（斗象安全）
+                                        分配给：张三（斗象）
                                         <div class="text-xs text-gray-500">联系方式：13800138000</div>
                                     </div>
                                 </div>
@@ -125,11 +129,17 @@
                 <div class="bg-white rounded-lg shadow-sm p-6">
                     <h2 class="text-lg font-medium text-gray-900 mb-4">研判结论</h2>
                     <div class="prose max-w-none">
+                        <p class="text-gray-600">风险：有效</p>
                         <p class="text-gray-600">经过详细分析，确认存在SQL注入漏洞，风险等级：高危。主要发现：</p>
                         <ul class="list-disc list-inside text-gray-600 mt-2">
                             <li>成功构造Payload获取数据库版本信息</li>
                             <li>可以通过Union注入获取敏感数据</li>
                             <li>数据库用户权限配置不当</li>
+                        </ul>
+                        <p class="text-gray-600 mt-4">研判步骤：</p>
+                        <ul class="list-disc list-inside text-gray-600 mt-2">
+                            <li>通过Ping工具验证漏洞存在</li>
+                            <li>通过漏洞验证工具验证漏洞存在</li>
                         </ul>
                         <p class="text-gray-600 mt-4">建议修复方案：</p>
                         <ul class="list-disc list-inside text-gray-600 mt-2">
@@ -203,8 +213,8 @@
                         <div>
                             <label class="block text-sm font-medium text-gray-700">选择接收方</label>
                             <select class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md">
-                                <option>斗象安全</option>
-                                <option>观安信息</option>
+                                <option>斗象</option>
+                                <option>观安</option>
                                 <option>其他单位</option>
                             </select>
                         </div>
