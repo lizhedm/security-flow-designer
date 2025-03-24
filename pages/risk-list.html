@@ -55,9 +55,21 @@
             </div>
         </div>
         <div class="grid grid-cols-3 gap-4">
+            <!-- 搜索框 -->
+            <div class="flex items-center space-x-2">
+                <div class="relative">
+                    <input type="text" placeholder="搜索风险ID或风险名称..." 
+                        class="w-full pl-8 pr-4 py-1.5 text-sm border border-gray-300 rounded-lg focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
+                    <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm"></i>
+                </div>
+            </div>
             <!-- 风险等级 -->
             <div class="flex items-center space-x-2">
                 <span class="text-sm text-gray-500">风险等级：</span>
+                <label class="inline-flex items-center">
+                    <input type="checkbox" class="form-checkbox text-red-600">
+                    <span class="ml-2 text-sm">严重</span>
+                </label>
                 <label class="inline-flex items-center">
                     <input type="checkbox" class="form-checkbox text-red-600">
                     <span class="ml-2 text-sm">高危</span>
@@ -69,6 +81,10 @@
                 <label class="inline-flex items-center">
                     <input type="checkbox" class="form-checkbox text-yellow-600">
                     <span class="ml-2 text-sm">低危</span>
+                </label>
+                <label class="inline-flex items-center">
+                    <input type="checkbox" class="form-checkbox text-yellow-600">
+                    <span class="ml-2 text-sm">信息</span>
                 </label>
             </div>
             <!-- 处置状态 -->
@@ -90,7 +106,7 @@
                 <input type="date" class="form-input text-sm border-gray-300 rounded">
             </div>
             <!-- 优先级评分范围 -->
-            <div class="flex items-center space-x-2 col-span-2">
+            <div class="flex items-center space-x-2">
                 <span class="text-sm text-gray-500">优先级评分：</span>
                 <div class="flex items-center space-x-2">
                     <input type="range" min="0" max="100" value="0" class="flex-grow" id="priorityMin">
@@ -98,6 +114,44 @@
                     <span class="text-gray-500">至</span>
                     <input type="range" min="0" max="100" value="100" class="flex-grow" id="priorityMax">
                     <span class="text-sm text-gray-500" id="priorityMaxValue">1</span>
+                </div>
+            </div>
+            <!-- 数据来源 -->
+            <div class="flex items-center space-x-2">
+                <span class="text-sm text-gray-500">数据来源：</span>
+                <div class="relative" x-data="{ open: false }">
+                    <button @click="open = !open" class="px-3 py-1.5 border border-gray-300 rounded-lg text-sm flex items-center">
+                        <span>选择来源</span>
+                        <i class="fas fa-chevron-down ml-2"></i>
+                    </button>
+                    <div x-show="open" @click.away="open = false" class="absolute z-10 mt-1 w-48 bg-white rounded-lg shadow-lg border border-gray-200">
+                        <div class="p-2 space-y-1">
+                            <label class="flex items-center">
+                                <input type="checkbox" class="form-checkbox text-blue-600">
+                                <span class="ml-2 text-sm">运营商-移动</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="form-checkbox text-blue-600">
+                                <span class="ml-2 text-sm">运营商-联通</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="form-checkbox text-blue-600">
+                                <span class="ml-2 text-sm">运营商-电信</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="form-checkbox text-blue-600">
+                                <span class="ml-2 text-sm">SHCERT</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="form-checkbox text-blue-600">
+                                <span class="ml-2 text-sm">支撑单位</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="form-checkbox text-blue-600">
+                                <span class="ml-2 text-sm">央办下发</span>
+                            </label>
+                        </div>
+                    </div>
                 </div>
             </div>
             <!-- 风险来源 -->
@@ -182,7 +236,7 @@
                         <th class="sticky left-0 z-10 bg-gray-50 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-r">
                             风险ID
                         </th>
-                        <th class="sticky left-[10px] z-10 bg-gray-50 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-r">
+                        <th class="sticky left-[100px] z-10 bg-gray-50 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-r">
                             风险名称
                         </th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">风险等级</th>
@@ -192,7 +246,9 @@
                         </th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">单位编号</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">关联资产</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">资产碰撞</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">风险来源</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">数据来源</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
                             发现时间
                             <i class="fas fa-sort ml-1 text-gray-400"></i>
@@ -228,7 +284,11 @@
                                 查看 (3个)
                             </button>
                         </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-2 py-1 text-sm rounded-full bg-red-100 text-red-800">命中</span>
+                        </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">威胁情报</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">SHCERT</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-03-15 10:30</td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <span class="px-2 py-1 text-xs rounded-full bg-yellow-100 text-yellow-800">处置中</span>
@@ -272,7 +332,11 @@
                                 查看 (2个)
                             </button>
                         </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-2 py-1 text-sm rounded-full bg-red-100 text-red-800">命中</span>
+                        </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">安全扫描</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">SHCERT</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-03-15 11:45</td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">已闭环</span>
@@ -312,13 +376,17 @@
                             </div>
                             <span class="text-xs text-gray-500">0.65</span>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">UNIT-002</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">-</td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <button class="text-blue-600 hover:text-blue-800">
                                 查看 (1个)
                             </button>
                         </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-2 py-1 text-sm rounded-full bg-gray-100 text-gray-800">未命中</span>
+                        </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">流量分析</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">运营商-移动</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-03-20 15:45</td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <span class="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-800">待研判</span>
@@ -358,7 +426,11 @@
                                 查看 (2个)
                             </button>
                         </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-2 py-1 text-sm rounded-full bg-red-100 text-red-800">命中</span>
+                        </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">安全扫描</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">运营商-联通</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-03-21 09:30</td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <span class="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-800">待研判</span>
@@ -398,7 +470,11 @@
                                 查看 (4个)
                             </button>
                         </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-2 py-1 text-sm rounded-full bg-red-100 text-red-800">命中</span>
+                        </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">IDS告警</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">央办下发</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-03-21 10:15</td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <span class="px-2 py-1 text-xs rounded-full bg-yellow-100 text-yellow-800">处置中</span>
