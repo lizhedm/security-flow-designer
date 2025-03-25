@@ -6,6 +6,10 @@
     <title>研判工单</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- <link href="../lib/css/tailwind.min.css" rel="stylesheet"> -->
+    <!-- <link href="../lib/css/fontawesome.min.css" rel="stylesheet"> -->
+    <!-- <script src="../lib/js/alpine.min.js" defer></script> -->
+
     <style>
         .overflow-x-auto {
             scrollbar-width: thin;
@@ -43,6 +47,9 @@
                 <div class="flex space-x-2">
                     <button class="px-3 py-1.5 text-sm text-blue-600 hover:bg-blue-50 rounded-lg transition-colors duration-200">
                         <i class="fas fa-save mr-1"></i>保存筛选
+                    </button>
+                    <button class="px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-50 rounded-lg transition-colors duration-200">
+                        <i class="fas fa-file-export mr-1"></i>已存筛选
                     </button>
                     <button class="px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-50 rounded-lg transition-colors duration-200">
                         <i class="fas fa-undo mr-1"></i>重置
@@ -88,7 +95,7 @@
 
             <div class="flex flex-wrap gap-2 mt-3 pt-3 border-t">
                 <!-- 工单状态 -->
-                <!-- 待处理、研判中、已反馈（研判人员有反馈，需应急中心回复）、已验证（研判人员完成研判，等待应急中心确认）、已归档（应急中心已确认并结束工单）、已撤回（应急中心撤回工单） -->
+                <!-- 待处理、处理中、已反馈（研判人员有反馈，需应急中心回复）、已完成（研判人员完成研判，等待应急中心确认）、已归档（应急中心已确认并结束工单）、已撤回（应急中心撤回工单） -->
                 <div class="flex items-center space-x-2">
                     <span class="text-sm text-gray-500">工单状态：</span>
                     <div class="flex gap-2">
@@ -98,7 +105,7 @@
                         </label>
                         <label class="inline-flex items-center px-2 py-1 bg-white border rounded-lg cursor-pointer hover:bg-gray-50">
                             <input type="checkbox" class="form-checkbox text-blue-600 rounded h-3 w-3">
-                            <span class="ml-1.5 text-sm">研判中</span>
+                            <span class="ml-1.5 text-sm">处理中</span>
                         </label>
                         <label class="inline-flex items-center px-2 py-1 bg-white border rounded-lg cursor-pointer hover:bg-gray-50">
                             <input type="checkbox" class="form-checkbox text-blue-600 rounded h-3 w-3">
@@ -106,7 +113,7 @@
                         </label>
                         <label class="inline-flex items-center px-2 py-1 bg-white border rounded-lg cursor-pointer hover:bg-gray-50">
                             <input type="checkbox" class="form-checkbox text-blue-600 rounded h-3 w-3">
-                            <span class="ml-1.5 text-sm">已验证</span>
+                            <span class="ml-1.5 text-sm">已完成</span>
                         </label>
                         <label class="inline-flex items-center px-2 py-1 bg-white border rounded-lg cursor-pointer hover:bg-gray-50">
                             <input type="checkbox" class="form-checkbox text-blue-600 rounded h-3 w-3">
@@ -146,16 +153,32 @@
 
         <!-- 工具栏 -->
         <div class="flex justify-between items-center mb-4">
-            <div class="flex space-x-2">
-                <button class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-                    <i class="fas fa-plus mr-2"></i>新建工单
-                </button>
-                <button class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
-                    <i class="fas fa-download mr-2"></i>导出
-                </button>
+            <div class="flex items-center space-x-4">
+                <div class="relative" x-data="{ open: false }">
+                    <button @click="open = !open"
+                        class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200">
+                        批量操作
+                        <i class="fas fa-chevron-down ml-2"></i>
+                    </button>
+                    <div x-show="open" @click.away="open = false"
+                        class="absolute z-50 mt-2 w-40 bg-white rounded-lg shadow-lg border border-gray-200 hidden"
+                        id="batchOperationDropdown">
+                        <div class="py-1">
+                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                <i class="fas fa-check mr-2"></i>批量确认结果
+                            </a>
+                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                <i class="fas fa-play mr-2"></i>批量重新派发
+                            </a>
+                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                <i class="fas fa-trash mr-2"></i>批量撤回
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <span class="text-sm text-gray-500">已选择 0 项</span>
             </div>
             <div class="flex items-center space-x-4">
-                <span class="text-sm text-gray-500">共 5 条记录</span>
                 <button class="px-3 py-1 text-sm border border-gray-300 rounded hover:bg-gray-50">
                     <i class="fas fa-sync-alt mr-1"></i>刷新
                 </button>
@@ -171,13 +194,15 @@
                             <th class="sticky left-0 z-10 bg-gray-50 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-r">
                                 工单ID
                             </th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">关联风险</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">关联风险ID</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">关联风险名称</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">优先级</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">接收方</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">处置人</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">创建时间</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">更新时间</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">状态</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">研判结果</th>
                             <th class="sticky right-0 z-10 bg-gray-50 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-l">
                                 操作
                             </th>
@@ -191,20 +216,24 @@
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-blue-600">
                                 <a href="#" class="hover:text-blue-800">RISK-001</a>
                             </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-blue-600">
+                                <a href="#" class="hover:text-blue-800">SQL注入</a>
+                            </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <span class="px-2 py-1 text-xs rounded-full bg-red-100 text-red-800">高</span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">斗象</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">张三</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-03-15 10:30</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-03-15 14:20</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">-</td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="px-2 py-1 text-xs rounded-full bg-yellow-100 text-yellow-800">研判中</span>
+                                <span class="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-800">待处理</span>
                             </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">-</td>
                             <td class="sticky right-0 z-10 bg-white px-6 py-4 whitespace-nowrap text-sm border-l">
                                 <div class="flex space-x-2">
-                                    <button class="text-blue-600 hover:text-blue-800">研判</button>
-                                    <button class="text-blue-600 hover:text-blue-800">重新派发</button>
+                                    <button onclick="navigateTo('analysis-workbench')" class="text-blue-600 hover:text-blue-800">研判</button>
+                                    <button onclick="showReassignDialog()" class="text-blue-600 hover:text-blue-800">重新派发</button>
                                     <button onclick="navigateTo('work-order-detail')" class="text-blue-600 hover:text-blue-800">详情</button>
                                 </div>
                             </td>
@@ -216,6 +245,9 @@
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-blue-600">
                                 <a href="#" class="hover:text-blue-800">RISK-002</a>
                             </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-blue-600">
+                                <a href="#" class="hover:text-blue-800">XSS跨站脚本</a>
+                            </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <span class="px-2 py-1 text-xs rounded-full bg-orange-100 text-orange-800">中</span>
                             </td>
@@ -224,12 +256,13 @@
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-03-15 11:30</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-03-15 15:20</td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="px-2 py-1 text-xs rounded-full bg-red-100 text-red-600">已验证</span>
+                                <span class="px-2 py-1 text-xs rounded-full bg-red-100 text-red-600">已完成</span>
                             </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">有效</td>
                             <td class="sticky right-0 z-10 bg-white px-6 py-4 whitespace-nowrap text-sm border-l">
                                 <div class="flex space-x-2">
-                                    <button class="text-blue-600 hover:text-blue-800">确认结果</button>
-                                    <button class="text-blue-600 hover:text-blue-800">重新派发</button>
+                                    <button onclick="confirmResult()" class="text-blue-600 hover:text-blue-800">确认结果</button>
+                                    <button onclick="showReassignDialog()" class="text-blue-600 hover:text-blue-800">重新派发</button>
                                     <button onclick="navigateTo('work-order-detail')" class="text-blue-600 hover:text-blue-800">详情</button>
                                 </div>
                             </td>
@@ -242,6 +275,9 @@
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-blue-600">
                                 <a href="#" class="hover:text-blue-800">RISK-003</a>
                             </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-blue-600">
+                                <a href="#" class="hover:text-blue-800">SQL注入</a>
+                            </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <span class="px-2 py-1 text-xs rounded-full bg-red-100 text-red-800">高</span>
                             </td>
@@ -250,12 +286,13 @@
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-03-15 13:30</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-03-15 16:20</td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="px-2 py-1 text-xs rounded-full bg-yellow-100 text-yellow-800">研判中</span>
+                                <span class="px-2 py-1 text-xs rounded-full bg-yellow-100 text-yellow-800">处理中</span>
                             </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">-</td>
                             <td class="sticky right-0 z-10 bg-white px-6 py-4 whitespace-nowrap text-sm border-l">
                                 <div class="flex space-x-2">
-                                    <button class="text-blue-600 hover:text-blue-800">研判</button>
-                                    <button class="text-blue-600 hover:text-blue-800">重新派发</button>
+                                    <button onclick="navigateTo('analysis-workbench')" class="text-blue-600 hover:text-blue-800">研判</button>
+                                    <button onclick="showReassignDialog()" class="text-blue-600 hover:text-blue-800">重新派发</button>
                                     <button onclick="navigateTo('work-order-detail')" class="text-blue-600 hover:text-blue-800">详情</button>
                                 </div>
                             </td>
@@ -267,6 +304,9 @@
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-blue-600">
                                 <a href="#" class="hover:text-blue-800">RISK-004</a>
                             </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-blue-600">
+                                <a href="#" class="hover:text-blue-800">可疑的外连行为</a>
+                            </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <span class="px-2 py-1 text-xs rounded-full bg-orange-100 text-orange-800">中</span>
                             </td>
@@ -277,10 +317,40 @@
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">已归档</span>
                             </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">无效</td>
                             <td class="sticky right-0 z-10 bg-white px-6 py-4 whitespace-nowrap text-sm border-l">
                                 <div class="flex space-x-2">
-                                    <button class="text-blue-600 hover:text-blue-800">研判</button>
-                                    <button class="text-blue-600 hover:text-blue-800">重新派发</button>
+                                    <button onclick="confirmResult()" class="text-blue-600 hover:text-blue-800">确认结果</button>
+                                    <button onclick="showReassignDialog()" class="text-blue-600 hover:text-blue-800">重新派发</button>
+                                    <button onclick="navigateTo('work-order-detail')" class="text-blue-600 hover:text-blue-800">详情</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="hover:bg-gray-50">
+                            <td class="sticky left-0 z-10 bg-white px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 border-r">
+                                TASK-005
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-blue-600">
+                                <a href="#" class="hover:text-blue-800">RISK-005</a>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-blue-600">
+                                <a href="#" class="hover:text-blue-800">弱口令风险</a>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2 py-1 text-xs rounded-full bg-yellow-100 text-yellow-800">低</span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">斗象</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">赵六</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-03-15 15:30</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-03-15 18:20</td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800">已反馈</span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">-</td>
+                            <td class="sticky right-0 z-10 bg-white px-6 py-4 whitespace-nowrap text-sm border-l">
+                                <div class="flex space-x-2">
+                                    <button onclick="navigateTo('analysis-workbench')" class="text-blue-600 hover:text-blue-800">研判</button>
+                                    <button onclick="showReassignDialog()" class="text-blue-600 hover:text-blue-800">重新派发</button>
                                     <button onclick="navigateTo('work-order-detail')" class="text-blue-600 hover:text-blue-800">详情</button>
                                 </div>
                             </td>
@@ -293,7 +363,7 @@
         <!-- 分页 -->
         <div class="flex justify-between items-center mt-4">
             <div class="text-sm text-gray-500">
-                显示 1-4 条，共 4 条
+                显示 1-5 条，共 5 条
             </div>
             <div class="flex space-x-2">
                 <button class="px-3 py-1 border rounded hover:bg-gray-50">&lt;</button>
@@ -337,6 +407,110 @@
         </div>
     </div>
 
+    <!-- 重新派发弹窗 -->
+    <div id="reassignModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg shadow-xl w-[500px]">
+            <div class="flex justify-between items-center p-6 border-b">
+                <h3 class="text-lg font-medium">重新派发工单</h3>
+                <button onclick="closeReassignDialog()" class="text-gray-400 hover:text-gray-500">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="p-6 space-y-4">
+                <div class="space-y-2">
+                    <label class="text-sm text-gray-700">接收方</label>
+                    <select class="w-full px-3 py-2 border rounded-lg">
+                        <option value="斗象">斗象</option>
+                        <option value="观安">观安</option>
+                    </select>
+                </div>
+                <div class="space-y-2">
+                    <label class="text-sm text-gray-700">处置人</label>
+                    <select class="w-full px-3 py-2 border rounded-lg">
+                        <option value="张三">张三</option>
+                        <option value="李四">李四</option>
+                        <option value="王五">王五</option>
+                    </select>
+                </div>
+                <div class="space-y-2">
+                    <label class="text-sm text-gray-700">派发原因</label>
+                    <textarea class="w-full px-3 py-2 border rounded-lg" rows="3"></textarea>
+                </div>
+            </div>
+            <div class="flex justify-end p-6 border-t bg-gray-50">
+                <button onclick="closeReassignDialog()" class="px-4 py-2 text-gray-600 hover:text-gray-800 mr-2">取消</button>
+                <button onclick="confirmReassign()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">确认派发</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 保存筛选弹窗 -->
+    <div id="saveFilterDialog" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg shadow-xl w-[500px]">
+            <div class="flex justify-between items-center p-6 border-b">
+                <h3 class="text-lg font-medium">保存筛选条件</h3>
+                <button onclick="closeSaveFilterDialog()" class="text-gray-400 hover:text-gray-500">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="p-6 space-y-4">
+                <div class="space-y-2">
+                    <label class="text-sm text-gray-700">筛选条件名称</label>
+                    <input type="text" class="w-full px-3 py-2 border rounded-lg" placeholder="请输入筛选条件名称">
+                </div>
+            </div>
+            <div class="flex justify-end p-6 border-t bg-gray-50">
+                <button onclick="closeSaveFilterDialog()" class="px-4 py-2 text-gray-600 hover:text-gray-800 mr-2">取消</button>
+                <button class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 已存筛选弹窗 -->
+    <div id="savedFiltersDialog" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg shadow-xl w-[500px]">
+            <div class="flex justify-between items-center p-6 border-b">
+                <h3 class="text-lg font-medium">已存筛选条件</h3>
+                <button onclick="closeSavedFiltersDialog()" class="text-gray-400 hover:text-gray-500">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="p-6 space-y-4">
+                <div class="space-y-2">
+                    <div class="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg">
+                        <div>
+                            <p class="font-medium">待处理工单</p>
+                            <p class="text-sm text-gray-500">创建人：张三</p>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <button class="px-3 py-1 text-sm text-blue-600 hover:bg-blue-50 rounded">应用</button>
+                            <button class="px-3 py-1 text-sm text-red-600 hover:bg-red-50 rounded">删除</button>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg">
+                        <div>
+                            <p class="font-medium">高优先级工单</p>
+                            <p class="text-sm text-gray-500">创建人：李四</p>
+                        </div>  
+                        <div class="flex items-center space-x-2">
+                            <button class="px-3 py-1 text-sm text-blue-600 hover:bg-blue-50 rounded">应用</button>
+                            <button class="px-3 py-1 text-sm text-red-600 hover:bg-red-50 rounded">删除</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="flex justify-end p-6 border-t bg-gray-50">
+                <button onclick="closeSavedFiltersDialog()" class="px-4 py-2 text-gray-600 hover:text-gray-800">取消</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 确认结果提示 -->
+    <div id="toast" class="fixed top-4 right-4 flex items-center px-4 py-3 bg-green-500 text-white rounded-lg shadow-lg transform transition-all duration-300 translate-y-[-100%] opacity-0">
+        <i class="fas fa-check-circle mr-2"></i>
+        <span id="toastMessage"></span>
+    </div>
+
     <script>
         // 添加消息监听器，接收来自template.html的消息并转发给home.html
         window.addEventListener('message', function(event) {
@@ -352,6 +526,65 @@
                 type: 'navigation',
                 page: page
             }, '*');
+        }
+
+        // 重新派发相关函数
+        function showReassignDialog() {
+            document.getElementById('reassignModal').classList.remove('hidden');
+        }
+
+        function closeReassignDialog() {
+            document.getElementById('reassignModal').classList.add('hidden');
+        }
+
+        function confirmReassign() {
+            closeReassignDialog();
+            // 这里可以添加派发成功的提示
+            alert('工单派发成功');
+        }
+
+        // 保存筛选弹窗
+        function showSaveFilterDialog() {
+            document.getElementById('saveFilterDialog').classList.remove('hidden');
+        }
+
+        function closeSaveFilterDialog() {
+            document.getElementById('saveFilterDialog').classList.add('hidden');
+        }
+
+        // 已存筛选弹窗
+        function showSavedFiltersDialog() {
+            document.getElementById('savedFiltersDialog').classList.remove('hidden');
+        }
+
+        function closeSavedFiltersDialog() {
+            document.getElementById('savedFiltersDialog').classList.add('hidden');
+        }
+
+        // 修改保存筛选和已存筛选按钮的点击事件
+        document.querySelector('button:has(.fa-save)').onclick = showSaveFilterDialog;
+        document.querySelector('button:has(.fa-file-export)').onclick = showSavedFiltersDialog;
+
+        // 确认结果按钮点击事件
+        function confirmResult() {
+            showToast('工单【TASK-002】已确认结果，并归档成功。');
+        }
+
+        // 显示确认结果提示
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toastMessage');
+            toastMessage.textContent = message;
+            
+            // 显示提示
+            toast.classList.remove('translate-y-[-100%]', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+            
+            // 2秒后自动隐藏
+            setTimeout(() => {
+                toast.classList.add('translate-y-[-100%]', 'opacity-0');
+                toast.classList.remove('translate-y-0', 'opacity-100');
+            }, 2000);
         }
     </script>
 </body>

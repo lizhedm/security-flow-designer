@@ -15,8 +15,9 @@
             <div class="flex items-start justify-between">
                 <div class="space-y-4">
                     <div class="flex items-center space-x-4">
-                        <h1 class="text-2xl font-bold text-gray-900">WO-20240321001</h1>
+                        <h1 class="text-2xl font-bold text-gray-900">TASK-001</h1>
                         <span class="text-lg text-gray-500">关联风险ID: RISK-001</span>
+                        <span class="text-lg text-gray-500">关联风险名称: SQL注入</span>
                     </div>
                     <div class="flex items-center space-x-6">
                         <div class="flex items-center space-x-2">
@@ -46,6 +47,9 @@
                     </div>
                 </div>
                 <div class="flex space-x-2">
+                    <button class="px-4 py-2 text-sm text-blue-600 hover:bg-blue-50 rounded-lg transition-colors duration-200">
+                        <i class="fas fa-desktop mr-1"></i>打开研判工作台
+                    </button>
                     <button class="px-4 py-2 text-sm text-blue-600 hover:bg-blue-50 rounded-lg transition-colors duration-200">
                         <i class="fas fa-share-alt mr-1"></i>重新派发
                     </button>
@@ -109,7 +113,12 @@
             <div class="col-span-9 space-y-6">
                 <!-- 风险描述 -->
                 <div class="bg-white rounded-lg shadow-sm p-6">
-                    <h2 class="text-lg font-medium text-gray-900 mb-4">风险描述</h2>
+                    <h2 class="text-lg font-medium text-gray-900 mb-4">
+                        风险描述
+                        <button class="px-4 py-2 text-sm text-blue-600 hover:bg-blue-50 rounded-lg transition-colors duration-200">
+                            <i class="fas fa-eye mr-1"></i>查看风险详情
+                        </button>
+                    </h2>
                     <div class="prose max-w-none">
                         <p class="text-gray-600">发现疑似SQL注入漏洞，该漏洞可能导致未经授权的数据库访问。具体表现为：</p>
                         <ul class="list-disc list-inside text-gray-600 mt-2">
