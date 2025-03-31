@@ -4,7 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>研判工作台</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="../lib/css/tailwind.min.css" rel="stylesheet">
+    <link href="../lib/fontawesome/css/fontawesome.min.css" rel="stylesheet">
+    <script src="../lib/js/alpine.min.js" defer></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         .panel {
@@ -147,7 +149,7 @@
         <div class="panel">
             <div class="panel-title">
                 <span>信息展示</span>
-                <button class="text-sm text-blue-600 hover:text-blue-800">展开详情</button>
+                <button class="text-sm text-blue-600 hover:text-blue-800">查看风险详情</button>
             </div>
             <div class="space-y-4">
                 <!-- 基本信息 -->
@@ -155,8 +157,16 @@
                     <h3 class="text-sm font-medium text-gray-500 mb-2">基本信息</h3>
                     <div class="grid grid-cols-2 gap-4">
                         <div>
+                            <span class="text-sm text-gray-500">工单ID：</span>
+                            <span class="text-sm text-blue-500">TASK-001</span>
+                        </div>
+                        <div>
                             <span class="text-sm text-gray-500">风险ID：</span>
-                            <span id="riskId" class="text-sm">-</span>
+                            <span id="riskId" class="text-sm text-blue-500">RISK-001</span>
+                        </div>
+                        <div>
+                            <span class="text-sm text-gray-500">风险名称：</span>
+                            <span class="text-sm text-blue-500">弱口令风险</span>
                         </div>
                         <div>
                             <span class="text-sm text-gray-500">风险类型：</span>
@@ -353,15 +363,23 @@
                     <div class="flex justify-between items-start mb-2">
                         <span class="text-sm font-medium">
                             相似案例 #KB-001    
-                            <button class="text-sm text-blue-600 hover:text-blue-800">查看详情</button>
-                            <button class="text-sm text-blue-600 hover:text-blue-800">一键复用</button>
                         </span>
                         <span class="text-xs text-gray-500">相似度: 92%</span>
                     </div>
                     <p class="text-sm text-gray-600 mb-2">SQL注入漏洞导致的数据泄露事件分析...</p>
-                    <div class="flex items-center space-x-2">
-                        <span class="text-xs px-2 py-1 bg-blue-100 text-blue-800 rounded-full">已解决</span>
-                        <span class="text-xs text-gray-500">2024-02-15</span>
+                    <div class="flex items-start justify-between">
+                        <div class="flex items-center space-x-2">
+                            <span class="text-xs px-2 py-1 bg-blue-100 text-blue-800 rounded-full">已解决</span>
+                            <span class="text-xs text-gray-500">2024-02-15</span>
+                        </div>
+                        <div class="flex space-x-2">
+                            <button class="px-4 py-2 text-sm text-blue-600 hover:bg-blue-50 rounded-lg transition-colors duration-200">
+                                <i class="fas fa-eye mr-1"></i> 查看详情
+                            </button>
+                            <button class="px-4 py-2 text-sm text-blue-600 hover:bg-blue-50 rounded-lg transition-colors duration-200">
+                                <i class="fas fa-copy mr-1"></i> 一键复用
+                            </button>
+                        </div>
                     </div>
                 </div>
                 <!-- 更多相似案例... -->

@@ -82,8 +82,10 @@
                     <a href="#" class="subnav-item block px-6 py-2" onclick="loadPage('risk-list')">风险列表</a>
                     <a href="#" class="subnav-item block px-6 py-2" onclick="loadPage('task-list')">研判工单</a>
                     <a href="#" class="subnav-item block px-6 py-2" onclick="loadPage('analysis-workbench')">研判工作台</a>
+                    <a href="#" class="subnav-item block px-6 py-2" onclick="loadPage('knowledge-base')">研判知识库</a>
                 </div>
                 <a href="#" class="subnav-item block px-6 py-2" onclick="loadPage('flows')">流程管理</a>
+                <a href="#" class="subnav-item block px-6 py-2" onclick="loadPage('risk-sort-config')">风险排序配置</a>
             </div>
             <!-- 资产汇聚子菜单 -->
             <div id="asset-menu" class="py-4 hidden">
@@ -182,7 +184,8 @@
                 'task-list': { nav: 'risk', subnav: 'task-list', parent: 'analysis-submenu' },
                 'analysis-workbench': { nav: 'risk', subnav: 'analysis-workbench', parent: 'analysis-submenu' },
                 'flows': { nav: 'risk', subnav: 'flows' },
-                
+                'knowledge-base': { nav: 'risk', subnav: 'knowledge-base', parent: 'analysis-submenu' },
+                'risk-sort-config': { nav: 'risk', subnav: 'risk-sort-config' },
                 // 资产汇聚
                 'asset-search': { nav: 'asset', subnav: 'asset-search' },
                 

@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>风险排序配置</title>
+    <link href="../lib/css/tailwind.min.css" rel="stylesheet">
+    <link href="../lib/fontawesome/css/fontawesome.min.css" rel="stylesheet">
+    <script src="../lib/js/alpine.min.js" defer></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        [data-tooltip]:before {
+    /* 移除原有content定义 */
+        }
+
+        /* 新增以下规则 */
+        [data-tooltip] {
+            position: relative;
+            display: inline-block;
+        }
+
+        [data-tooltip]:after { /* 改用 ::after 伪元素 */
+            content: attr(data-tooltip);
+            bottom: auto; /* 调整定位 */
+            top: 100%; /* 提示框显示在元素下方 */
+            left: 50%;
+            transform: translateX(-50%);
+            /* 以下保持原有样式 ↓ */
+            padding: 8px 12px;
+            background: rgba(53, 51, 51, 0.8);
+            color: white;
+            border-radius: 4px;
+            font-size: 12px;
+            white-space: normal;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.5s ease;
+            z-index: 1000;
+            max-width: 300px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            pointer-events: none;
+        }
+
+        [data-tooltip]:hover:after { /* 对应hover状态 */
+            opacity: 1;
+            visibility: visible;
+        }
+        .info-icon {
+            display: inline-block;
+            margin-left: 4px;
+            color: #9CA3AF;
+            cursor: help;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 p-6">
+    <div class="mb-6">
+        <h1 class="text-2xl font-bold mb-4">风险排序配置</h1>
+        
+        <!-- 场景模式预设栏 -->
+        <div class="bg-white rounded-xl shadow-sm p-4 mb-6">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-4">
+                    <span class="text-sm text-gray-500">当前风险排序的场景模式：</span>
+                    <h3 class="text-sm text-blue-600">日常态风险排序</h3>
+                </div>
+                <div class="flex space-x-2">
+                    <button class="px-4 py-2 text-sm text-blue-600 hover:bg-blue-50 rounded-lg transition-colors duration-200">
+                        <i class="fas fa-save mr-1"></i> 保存当前配置为新场景
+                    </button>
+                    <button class="px-4 py-2 text-sm text-blue-600 hover:bg-blue-50 rounded-lg transition-colors duration-200">
+                        <i class="fas fa-history mr-1"></i> 切换配置场景
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 配置标签页 -->
+        <div class="bg-white rounded-xl shadow-sm">
+            <!-- 标签页导航 -->
+            <div class="border-b">
+                <nav class="flex space-x-8 px-6" aria-label="Tabs">
+                    <button class="px-4 py-3 text-sm font-medium text-blue-600 border-b-2 border-blue-600" onclick="switchTab('weight')">
+                        权重分配
+                    </button>
+                    <button class="px-4 py-3 text-sm font-medium text-gray-500 hover:text-gray-700" onclick="switchTab('filter')">
+                        过滤规则
+                    </button>
+                    <button class="px-4 py-3 text-sm font-medium text-gray-500 hover:text-gray-700" onclick="switchTab('aggregate')">
+                        聚合参数
+                    </button>
+                    <button class="px-4 py-3 text-sm font-medium text-gray-500 hover:text-gray-700" onclick="switchTab('segment')">
+                        分段排序
+                    </button>
+                    <button class="px-4 py-3 text-sm font-medium text-gray-500 hover:text-gray-700" onclick="switchTab('dynamic')">
+                        动态调整
+                    </button>
+                </nav>
+            </div>
+
+            <!-- 配置内容区域 -->
+            <div class="p-6">
+                <!-- 权重分配配置 -->
+                <div id="weight-tab" class="space-y-6">
+                    <div class="space-y-4">
+                        <div class="flex items-center space-x-2">
+                            <label class="text-sm font-medium text-gray-700">静态规则权重</label>
+                            <i class="fas fa-info-circle info-icon" data-tooltip="静态规则的权重占比（如CVSS评分、资产等级等维度）"></i>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <input type="range" min="0" max="100" value="70" class="w-2 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer" oninput="updateWeight(this, 'model')">
+                            <span class="text-sm text-gray-600">70%</span>
+                        </div>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div class="flex items-center space-x-2">
+                            <label class="text-sm font-medium text-gray-700">模型评分权重</label>
+                            <i class="fas fa-info-circle info-icon" data-tooltip="LightGBM模型输出的权重占比（和静态权重总和为100%）"></i>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <input type="range" min="0" max="100" value="30" class="w-2 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer" oninput="updateWeight(this, 'static')">
+                            <span class="text-sm text-gray-600">30%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 过滤规则配置 -->
+                <div id="filter-tab" class="space-y-6 hidden">
+                    <div class="space-y-4">
+                        <div class="flex items-center space-x-2">
+                            <label class="text-sm font-medium text-gray-700">必检字段列表</label>
+                            <i class="fas fa-info-circle info-icon" data-tooltip="勾选需强制校验的字段（如源IP、风险名称、发生时间），缺失则标记为无效"></i>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <label class="flex items-center space-x-2">
+                                <input type="checkbox" class="rounded text-blue-600">
+                                <span class="text-sm text-gray-700">源IP</span>
+                            </label>
+                            <label class="flex items-center space-x-2">
+                                <input type="checkbox" class="rounded text-blue-600">
+                                <span class="text-sm text-gray-700">目标IP</span>
+                            </label>
+                            <label class="flex items-center space-x-2">
+                                <input type="checkbox" class="rounded text-blue-600">
+                                <span class="text-sm text-gray-700">风险名称</span>
+                            </label>
+                            <label class="flex items-center space-x-2">
+                                <input type="checkbox" class="rounded text-blue-600">
+                                <span class="text-sm text-gray-700">发生时间</span>
+                            </label>
+                            <label class="flex items-center space-x-2">
+                                <i class="fas fa-plus-circle text-blue-600"></i>
+                                <span class="text-sm text-blue-600">添加字段</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div class="flex items-center space-x-2">
+                            <label class="text-sm font-medium text-gray-700">忽略规则</label>
+                            <i class="fas fa-info-circle info-icon" data-tooltip="支持逻辑运算符（如source_ip IN ('192.168.*', '10.0.0.0/8')）"></i>
+                        </div>
+                        <textarea class="w-full px-3 py-2 border rounded-lg text-sm h-32" placeholder="输入条件表达式"></textarea>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div class="flex items-center space-x-2">
+                            <label class="text-sm font-medium text-gray-700">技术关停名单</label>
+                            <i class="fas fa-info-circle info-icon" data-tooltip="直接过滤指定来源的风险事件"></i>
+                        </div>
+                        <textarea class="w-full px-3 py-2 border rounded-lg text-sm h-32" placeholder="输入IP/CIDR，每行一个"></textarea>
+                    </div>
+                </div>
+
+                <!-- 聚合参数配置 -->
+                <div id="aggregate-tab" class="space-y-6 hidden">
+                    <div class="space-y-4">
+                        <div class="flex items-center space-x-2">
+                            <label class="text-sm font-medium text-gray-700">时间窗口</label>
+                            <i class="fas fa-info-circle info-icon" data-tooltip="简单规则合并的时间范围（单位：分钟，默认10分钟）"></i>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <input type="number" min="1" max="60" value="10" class="w-32 px-3 py-2 border rounded-lg text-sm">
+                            <span class="text-sm text-gray-600">分钟</span>
+                        </div>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div class="flex items-center space-x-2">
+                            <label class="text-sm font-medium text-gray-700">聚类簇数（K值）</label>
+                            <i class="fas fa-info-circle info-icon" data-tooltip="K-MEANS算法的聚类数量（默认5，范围2-10）"></i>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <input type="number" min="2" max="10" value="5" class="w-32 px-3 py-2 border rounded-lg text-sm">
+                        </div>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div class="flex items-center space-x-2">
+                            <label class="text-sm font-medium text-gray-700">轮廓系数阈值</label>
+                            <i class="fas fa-info-circle info-icon" data-tooltip="聚类效果评估阈值，低于该值触发告警（默认0.5，范围0-1）"></i>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <input type="number" min="0" max="1" step="0.1" value="0.5" class="w-32 px-3 py-2 border rounded-lg text-sm">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 分段排序配置 -->
+                <div id="segment-tab" class="space-y-6 hidden">
+                    <div class="space-y-4">
+                        <div class="flex items-center space-x-2">
+                            <label class="text-sm font-medium text-gray-700">高危阈值</label>
+                            <i class="fas fa-info-circle info-icon" data-tooltip="FinalScore > 0.7的风险进入高危组，绝对优先处置"></i>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <input type="number" min="0" max="1" step="0.1" value="0.7" class="w-32 px-3 py-2 border rounded-lg text-sm">
+                        </div>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div class="flex items-center space-x-2">
+                            <label class="text-sm font-medium text-gray-700">中危阈值</label>
+                            <i class="fas fa-info-circle info-icon" data-tooltip="中危阈值 ≤ FinalScore ≤ 高危阈值的风险按资产价值加权排序"></i>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <input type="number" min="0" max="1" step="0.1" value="0.4" class="w-32 px-3 py-2 border rounded-lg text-sm">
+                        </div>
+                    </div>
+
+                    <div class="space-y-4">
+                        <!-- 处理策略 -->
+                        <div class="flex items-center space-x-2">
+                            <div class="flex items-center space-x-2">
+                                <label class="text-sm font-medium text-gray-700">低危处理策略</label>
+                                <i class="fas fa-info-circle info-icon" data-tooltip="可选择低危组的处理策略：延迟处理、加入训练集、人工复核等"></i>
+                            </div>
+                            </div>
+                                <div class="relative" x-data="{ open: false }">
+                                    <button @click="open = !open" class="px-3 py-1.5 border border-gray-300 rounded-lg text-sm flex items-center">
+                                        <span>选择处理策略</span>
+                                        <i class="fas fa-chevron-down ml-2"></i>
+                                    </button>
+                                    <div x-show="open" @click.away="open = false" class="absolute z-50 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200">
+                                        <div class="p-2 space-y-1">
+                                            <label class="flex items-center">
+                                                <input type="checkbox" class="form-checkbox text-blue-600">
+                                                <span class="ml-2 text-sm">延迟处理</span>
+                                            </label>
+                                            <label class="flex items-center">
+                                                <input type="checkbox" class="form-checkbox text-blue-600">
+                                                <span class="ml-2 text-sm">加入训练集</span>
+                                            </label>
+                                            <label class="flex items-center">
+                                                <input type="checkbox" class="form-checkbox text-blue-600">
+                                                <span class="ml-2 text-sm">人工复核</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                </div>
+                <!-- 动态调整规则 -->
+                <div id="dynamic-tab" class="space-y-6 hidden">
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-2">
+                                <label class="text-sm font-medium text-gray-700">权重自动衰减</label>
+                                <i class="fas fa-info-circle info-icon" data-tooltip="开启后，超24小时的威胁情报关联评分按指数衰减"></i>
+                            </div>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" class="sr-only peer">
+                                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                            </label>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div class="flex items-center space-x-2">
+                            <label class="text-sm font-medium text-gray-700">模型冲突降权</label>
+                            <i class="fas fa-info-circle info-icon" data-tooltip="模型与人工结果连续N次不一致时，自动降低模型权重（默认N=3）"></i>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <input type="number" min="1" max="10" value="3" class="w-32 px-3 py-2 border rounded-lg text-sm">
+                        </div>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div class="flex items-center space-x-2">
+                            <label class="text-sm font-medium text-gray-700">人工干预反馈权重</label>
+                            <i class="fas fa-info-circle info-icon" data-tooltip="人工调整优先级后的反馈值对模型训练的权重影响（默认10%）"></i>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <input type="range" min="0" max="100" value="10" class="w-2 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                            <span class="text-sm text-gray-600">10%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 操作按钮 -->
+                <div class="flex justify-end space-x-4 mt-6">
+                    <button class="px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 rounded-lg transition-colors duration-200">
+                        <i class="fas fa-undo mr-1"></i> 重置默认值
+                    </button>
+                    <button class="px-4 py-2 text-sm text-blue-600 hover:bg-blue-50 rounded-lg transition-colors duration-200">
+                        <i class="fas fa-save mr-1"></i> 保存配置
+                    </button>
+                    <button class="px-4 py-2 text-sm text-green-600 hover:bg-green-50 rounded-lg transition-colors duration-200">
+                        <i class="fas fa-play mr-1"></i> 测试配置
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 保存模板弹窗 -->
+    <div id="saveTemplateModal" class="fixed inset-0 bg-black bg-opacity-50 hidden">
+        <div class="fixed inset-0 flex items-center justify-center">
+            <div class="bg-white rounded-lg p-8 " style="
+    width: 500px;
+    height: 500px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    max-height: 100vh;
+    max-width: 100vw;
+    ">
+                <div class="flex justify-between items-center mb-8">
+                    <h3 class="text-2xl font-semibold">保存为新配置场景</h3>
+                    <button onclick="closeModal('saveTemplateModal')" class="text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="space-y-8">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">场景名称</label>
+                        <input type="text" class="w-full px-4 py-3 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="请输入模板名称">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">描述</label>
+                        <textarea class="w-full px-4 py-3 border rounded-lg text-sm h-40 focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="请输入模板描述"></textarea>
+                    </div>
+                </div>
+                <div class="flex justify-end space-x-4 mt-10">
+                    <button onclick="closeModal('saveTemplateModal')" class="px-6 py-2 text-sm text-gray-600 hover:bg-gray-50 rounded-lg transition-colors duration-200">
+                        取消
+                    </button>
+                    <button onclick="saveTemplate()" class="px-6 py-2 text-sm text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors duration-200">
+                        保存
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 切换配置场景弹窗 -->
+    <div id="loadTemplateModal" class="fixed inset-0 bg-black bg-opacity-50 hidden">
+        <div class="fixed inset-0 flex items-center justify-center">
+            <div class="bg-white rounded-lg p-6 w-96">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-semibold">切换配置场景</h3>
+                    <button onclick="closeModal('loadTemplateModal')" class="text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="space-y-4">
+                    <div class="max-h-96 overflow-y-auto">
+                        <div class="space-y-2">
+                            <div class="p-3 border rounded-lg hover:bg-gray-50 cursor-pointer" onclick="loadTemplate(1)">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <h4 class="font-medium">日常态风险排序</h4>
+                                        <p class="text-sm text-gray-500">适用于日常态风险排序场景</p>
+                                    </div>
+                                    <span class="text-sm text-gray-400">2024-03-20 12:00:00</span>
+                                </div>
+                            </div>
+                            <div class="p-3 border rounded-lg hover:bg-gray-50 cursor-pointer" onclick="loadTemplate(2)">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <h4 class="font-medium">应急态风险排序</h4>
+                                        <p class="text-sm text-gray-500">适用于应急态风险排序场景</p>
+                                    </div>
+                                    <span class="text-sm text-gray-400">2024-03-19 13:00:00</span>
+                                </div>
+                            </div>
+                            <div class="p-3 border rounded-lg hover:bg-gray-50 cursor-pointer" onclick="loadTemplate(3)">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <h4 class="font-medium">关基保护风险排序</h4>
+                                        <p class="text-sm text-gray-500">适用于关基保护风险排序场景</p>
+                                    </div>
+                                    <span class="text-sm text-gray-400">2024-03-18 14:00:00</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex justify-end mt-6">
+                    <button onclick="closeModal('loadTemplateModal')" class="px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 rounded-lg">
+                        关闭
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 测试配置弹窗 -->
+    <div id="testConfigModal" class="fixed inset-0 bg-black bg-opacity-50 hidden">
+        <div class="fixed inset-0 flex items-center justify-center">
+            <div class="bg-white rounded-lg p-6 w-[1200px]">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-semibold">配置测试结果</h3>
+                    <button onclick="closeModal('testConfigModal')" class="text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="space-y-4">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="p-4 border rounded-lg">
+                            <h4 class="font-medium mb-2">测试数据</h4>
+                            <div class="space-y-2">
+                                <div class="flex justify-between text-sm">
+                                    <span class="text-gray-500">总样本数</span>
+                                    <span>1000</span>
+                                </div>
+                                <div class="flex justify-between text-sm">
+                                    <span class="text-gray-500">高危样本</span>
+                                    <span class="text-red-600">50</span>
+                                </div>
+                                <div class="flex justify-between text-sm">
+                                    <span class="text-gray-500">中危样本</span>
+                                    <span class="text-orange-600">200</span>
+                                </div>
+                                <div class="flex justify-between text-sm">
+                                    <span class="text-gray-500">低危样本</span>
+                                    <span class="text-green-600">750</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-4 border rounded-lg">
+                            <h4 class="font-medium mb-2">排序效果</h4>
+                            <div class="space-y-2">
+                                <div class="flex justify-between text-sm">
+                                    <span class="text-gray-500">准确率</span>
+                                    <span class="text-green-600">95.2%</span>
+                                </div>
+                                <div class="flex justify-between text-sm">
+                                    <span class="text-gray-500">召回率</span>
+                                    <span class="text-green-600">92.8%</span>
+                                </div>
+                                <div class="flex justify-between text-sm">
+                                    <span class="text-gray-500">F1分数</span>
+                                    <span class="text-green-600">94.0%</span>
+                                </div>
+                                <div class="flex justify-between text-sm">
+                                    <span class="text-gray-500">平均响应时间</span>
+                                    <span>0.8s</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-4 border rounded-lg">
+                        <h4 class="font-medium mb-2">测试详情</h4>
+                        <div class="space-y-2">
+                            <div class="text-sm text-gray-600">
+                                <p>1. 权重分配测试：静态规则(70%)与模型评分(30%)的权重分配合理，未出现极端值</p>
+                                <p>2. 过滤规则测试：必检字段完整性检查通过，忽略规则语法正确</p>
+                                <p>3. 聚合参数测试：时间窗口(10min)与聚类参数(K=5)设置合理，轮廓系数(0.5)达标</p>
+                                <p>4. 分段排序测试：高危(>0.7)、中危(0.4-0.7)阈值划分合理，低危处理策略有效</p>
+                                <p>5. 动态调整测试：权重衰减与冲突降权机制运行正常</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex justify-end">
+                        <button onclick="showSortComparison()" class="px-4 py-2 text-sm text-blue-600 hover:bg-blue-50 rounded-lg transition-colors duration-200">
+                            <i class="fas fa-chart-line mr-1"></i> 查看排序对比
+                        </button>
+                    </div>
+                </div>
+                <div class="flex justify-end mt-6">
+                    <button onclick="closeModal('testConfigModal')" class="px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 rounded-lg">
+                        关闭
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 排序对比弹窗 -->
+    <div id="sortComparisonModal" class="fixed inset-0 bg-black bg-opacity-50 hidden">
+        <div class="fixed inset-0 flex items-center justify-center">
+            <div class="bg-white rounded-lg p-6 w-[1400px] h-[800px] flex flex-col">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-semibold">排序对比</h3>
+                    <button onclick="closeModal('sortComparisonModal')" class="text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="flex space-x-4 mb-4">
+                    <button class="px-4 py-2 text-sm font-medium text-blue-600 border-b-2 border-blue-600" onclick="switchComparisonTab('new')">
+                        当前新配置
+                    </button>
+                    <button class="px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-700" onclick="switchComparisonTab('old')">
+                        原有旧配置
+                    </button>
+                </div>
+                <div class="flex-1 overflow-auto" style="max-height: calc(100vh - 200px);">
+                    <table class="w-full">
+                        <thead class="sticky top-0 bg-white z-10">
+                            <tr class="bg-gray-50">
+                                <th class="px-4 py-2 text-left text-sm font-medium text-gray-500">排序顺序</th>
+                                <th class="px-4 py-2 text-left text-sm font-medium text-gray-500">风险ID</th>
+                                <th class="px-4 py-2 text-left text-sm font-medium text-gray-500">风险名称</th>
+                                <th class="px-4 py-2 text-left text-sm font-medium text-gray-500">风险等级</th>
+                                <th class="px-4 py-2 text-left text-sm font-medium text-gray-500">发生时间</th>
+                                <th class="px-4 py-2 text-left text-sm font-medium text-gray-500">数据来源</th>
+                                <th class="px-4 py-2 text-left text-sm font-medium text-gray-500">FinalScore</th>
+                                <th class="px-4 py-2 text-left text-sm font-medium text-gray-500">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="comparisonTableBody">
+                            <!-- 表格内容将通过JavaScript动态生成 -->
+                        </tbody>
+                    </table>
+                </div>
+                <div class="flex justify-end mt-4">
+                    <button onclick="closeModal('sortComparisonModal')" class="px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 rounded-lg">
+                        关闭
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 添加消息监听器，接收来自template.html的消息并转发给home.html
+        window.addEventListener('message', function(event) {
+            // 转发消息给顶层窗口
+            if (event.data.type === 'navigation') {
+                window.parent.postMessage(event.data, '*');
+            }
+        });
+
+        function navigateTo(page) {
+            // 向父窗口发送消息
+            window.parent.postMessage({
+                type: 'navigation',
+                page: page
+            }, '*');
+        }
+
+        // 标签页切换
+        function switchTab(tabName) {
+            // 隐藏所有标签页
+            document.querySelectorAll('[id$="-tab"]').forEach(tab => {
+                tab.classList.add('hidden');
+            });
+            // 显示选中的标签页
+            document.getElementById(tabName + '-tab').classList.remove('hidden');
+            
+            // 更新标签页导航样式
+            document.querySelectorAll('nav button').forEach(button => {
+                button.classList.remove('text-blue-600', 'border-b-2', 'border-blue-600');
+                button.classList.add('text-gray-500', 'hover:text-gray-700');
+            });
+            event.target.classList.remove('text-gray-500', 'hover:text-gray-700');
+            event.target.classList.add('text-blue-600', 'border-b-2', 'border-blue-600');
+        }
+
+        // 权重联动调整
+        function updateWeight(input, target) {
+            const value = parseInt(input.value);
+            const targetInput = document.querySelector(`input[oninput="updateWeight(this, '${target}')"]`);
+            const targetValue = 100 - value;
+            targetInput.value = targetValue;
+            targetInput.nextElementSibling.textContent = targetValue + '%';
+            input.nextElementSibling.textContent = value + '%';
+        }
+
+        // 显示弹窗
+        function showModal(modalId) {
+            document.getElementById(modalId).classList.remove('hidden');
+        }
+
+        // 关闭弹窗
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.add('hidden');
+        }
+
+        // 保存模板
+        function saveTemplate() {
+            // TODO: 实现保存模板逻辑
+            closeModal('saveTemplateModal');
+        }
+
+        // 加载模板
+        function loadTemplate(templateId) {
+            // TODO: 实现加载模板逻辑
+            closeModal('loadTemplateModal');
+        }
+
+        // 测试配置
+        function testConfig() {
+            showModal('testConfigModal');
+        }
+
+        // 显示排序对比
+        function showSortComparison() {
+            closeModal('testConfigModal');
+            showModal('sortComparisonModal');
+            loadComparisonData('new');
+        }
+
+        // 切换排序对比标签页
+        function switchComparisonTab(tab) {
+            const buttons = document.querySelectorAll('#sortComparisonModal button[onclick^="switchComparisonTab"]');
+            buttons.forEach(button => {
+                button.classList.remove('text-blue-600', 'border-b-2', 'border-blue-600');
+                button.classList.add('text-gray-500', 'hover:text-gray-700');
+            });
+            event.target.classList.remove('text-gray-500', 'hover:text-gray-700');
+            event.target.classList.add('text-blue-600', 'border-b-2', 'border-blue-600');
+            
+            loadComparisonData(tab);
+        }
+
+        // 加载排序对比数据
+        function loadComparisonData(tab) {
+            const tbody = document.getElementById('comparisonTableBody');
+            tbody.innerHTML = '';
+            
+            // 模拟数据
+            const riskTypes = ['SQL注入攻击', 'XSS跨站攻击', '暴力破解攻击', '端口扫描攻击', '文件上传漏洞', '命令执行漏洞', '目录遍历漏洞', '弱口令检测'];
+            const riskLevels = ['一般', '较大', '重大', '特别重大'];
+            const dataSources = ['央办下发', '支撑单位', '大数据中心', '微步', '运营商-移动', '运营商-联通', '运营商-电信', 'SHCERT'];
+            
+            // 生成随机风险ID
+            const riskIds = Array.from({length: 1000}, (_, i) => `RISK-${String(i + 1).padStart(6, '0')}`);
+            // 打乱风险ID顺序
+            for (let i = riskIds.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [riskIds[i], riskIds[j]] = [riskIds[j], riskIds[i]];
+            }
+
+            const data = Array.from({length: 1000}, (_, i) => ({
+                id: riskIds[i],
+                riskName: riskTypes[Math.floor(Math.random() * riskTypes.length)],
+                riskLevel: riskLevels[Math.floor(Math.random() * riskLevels.length)],
+                timestamp: new Date(Date.now() - Math.random() * 86400000).toLocaleString(),
+                dataSource: dataSources[Math.floor(Math.random() * dataSources.length)],
+                finalScore: (Math.random() * 0.5 + 0.3).toFixed(2)
+            }));
+
+            // 根据tab参数决定排序方式
+            if (tab === 'new') {
+                data.sort((a, b) => b.finalScore - a.finalScore);
+            } else {
+                data.sort((a, b) => {
+                    const levelOrder = {'特别重大': 4, '重大': 3, '较大': 2, '一般': 1};
+                    return levelOrder[b.riskLevel] - levelOrder[a.riskLevel];
+                });
+            }
+
+            // 生成表格行
+            data.forEach((item, index) => {
+                const tr = document.createElement('tr');
+                tr.className = 'border-b hover:bg-gray-50';
+                tr.innerHTML = `
+                    <td class="px-4 py-2 text-sm">${index + 1}</td>
+                    <td class="px-4 py-2 text-sm">${item.id}</td>
+                    <td class="px-4 py-2 text-sm">${item.riskName}</td>
+                    <td class="px-4 py-2 text-sm">
+                        <span class="px-2 py-1 rounded-full text-xs ${
+                            item.riskLevel === '特别重大' ? 'bg-red-100 text-red-800' :
+                            item.riskLevel === '重大' ? 'bg-orange-100 text-orange-800' :
+                            item.riskLevel === '较大' ? 'bg-yellow-100 text-yellow-800' :
+                            'bg-green-100 text-green-800'
+                        }">${item.riskLevel}</span>
+                    </td>
+                    <td class="px-4 py-2 text-sm">${item.timestamp}</td>
+                    <td class="px-4 py-2 text-sm">
+                        ${item.dataSource === '央办下发' ? '<i class="fas fa-flag text-red-600 mr-1"></i>' : ''}
+                        ${item.dataSource}
+                    </td>
+                    <td class="px-4 py-2 text-sm">${item.finalScore}</td>
+                    <td class="px-4 py-2 text-sm">
+                        <button onclick="compareSorting('${item.id}')" class="text-blue-600 hover:text-blue-800">
+                            <i class="fas fa-exchange-alt"></i> 对比
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // 对比新旧排序
+        function compareSorting(riskId) {
+            // TODO: 实现新旧排序对比逻辑
+            alert('正在开发中...');
+        }
+
+        // 为按钮添加点击事件
+        document.querySelector('button:has(i.fa-save)').onclick = () => showModal('saveTemplateModal');
+        document.querySelector('button:has(i.fa-history)').onclick = () => showModal('loadTemplateModal');
+        document.querySelector('button:has(i.fa-play)').onclick = testConfig;
+    </script>
+</body>
+</html> 

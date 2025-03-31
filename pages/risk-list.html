@@ -4,7 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>风险列表</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="../lib/css/tailwind.min.css" rel="stylesheet">
+    <link href="../lib/fontawesome/css/fontawesome.min.css" rel="stylesheet">
+    <script src="../lib/js/alpine.min.js" defer></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         .risk-high { background-color: #FEE2E2; }
@@ -66,28 +69,31 @@
                     <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm"></i>
                 </div>
             </div>
+            <!-- 发现时间范围 -->
+            <div class="flex items-center space-x-2">
+                <span class="text-sm text-gray-500">发现时间范围：</span>
+                <input type="date" class="form-input text-sm border-gray-300 rounded">
+                <span class="text-gray-500">至</span>
+                <input type="date" class="form-input text-sm border-gray-300 rounded">
+            </div>
             <!-- 风险等级 -->
             <div class="flex items-center space-x-2">
                 <span class="text-sm text-gray-500">风险等级：</span>
                 <label class="inline-flex items-center">
                     <input type="checkbox" class="form-checkbox text-red-600">
-                    <span class="ml-2 text-sm">严重</span>
+                    <span class="ml-2 text-sm">特别重大</span>
                 </label>
                 <label class="inline-flex items-center">
                     <input type="checkbox" class="form-checkbox text-red-600">
-                    <span class="ml-2 text-sm">高危</span>
+                    <span class="ml-2 text-sm">重大</span>
                 </label>
                 <label class="inline-flex items-center">
                     <input type="checkbox" class="form-checkbox text-orange-600">
-                    <span class="ml-2 text-sm">中危</span>
+                    <span class="ml-2 text-sm">较大</span>
                 </label>
                 <label class="inline-flex items-center">
                     <input type="checkbox" class="form-checkbox text-yellow-600">
-                    <span class="ml-2 text-sm">低危</span>
-                </label>
-                <label class="inline-flex items-center">
-                    <input type="checkbox" class="form-checkbox text-yellow-600">
-                    <span class="ml-2 text-sm">信息</span>
+                    <span class="ml-2 text-sm">一般</span>
                 </label>
             </div>
              <!-- 处置状态 -->
@@ -124,12 +130,31 @@
                     </div>
                 </div>
             </div>
-            <!-- 发现时间范围 -->
+            <!-- 风险来源 -->
             <div class="flex items-center space-x-2">
-                <span class="text-sm text-gray-500">发现时间范围：</span>
-                <input type="date" class="form-input text-sm border-gray-300 rounded">
-                <span class="text-gray-500">至</span>
-                <input type="date" class="form-input text-sm border-gray-300 rounded">
+                <span class="text-sm text-gray-500">风险来源：</span>
+                <div class="relative" x-data="{ open: false }">
+                    <button @click="open = !open" class="px-3 py-1.5 border border-gray-300 rounded-lg text-sm flex items-center">
+                        <span>选择风险来源</span>
+                        <i class="fas fa-chevron-down ml-2"></i>
+                    </button>
+                    <div x-show="open" @click.away="open = false" class="absolute z-10000 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200">
+                        <div class="p-2 space-y-1">
+                            <label class="flex items-center">
+                                <input type="checkbox" class="form-checkbox text-blue-600">
+                                <span class="ml-2 text-sm">央办下发</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="form-checkbox text-blue-600">
+                                <span class="ml-2 text-sm">第三方上报</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="form-checkbox text-blue-600">
+                                <span class="ml-2 text-sm">平台生成</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
             </div>
             <!-- 数据来源 -->
             <div class="flex items-center space-x-2">
@@ -139,7 +164,7 @@
                         <span>选择数据来源</span>
                         <i class="fas fa-chevron-down ml-2"></i>
                     </button>
-                    <div x-show="open" @click.away="open = false" class="absolute z-10 mt-1 w-48 bg-white rounded-lg shadow-lg border border-gray-200">
+                    <div x-show="open" @click.away="open = false" class="absolute z-100000 mt-1 w-48 bg-white rounded-lg shadow-lg border border-gray-200">
                         <div class="p-2 space-y-1">
                             <label class="flex items-center">
                                 <input type="checkbox" class="form-checkbox text-blue-600">
@@ -165,39 +190,43 @@
                                 <input type="checkbox" class="form-checkbox text-blue-600">
                                 <span class="ml-2 text-sm">央办下发</span>
                             </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="form-checkbox text-blue-600">
+                                <span class="ml-2 text-sm">大数据中心</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="form-checkbox text-blue-600">
+                                <span class="ml-2 text-sm">微步</span>
+                            </label>
                         </div>
                     </div>
                 </div>
             </div>
-            <!-- 风险来源 -->
-            <div class="flex items-center space-x-2">
-                <span class="text-sm text-gray-500">风险来源：</span>
+             <!-- 风险类别 -->
+             <div class="flex items-center space-x-2">
+                <span class="text-sm text-gray-500">风险类别：</span>
                 <div class="relative" x-data="{ open: false }">
                     <button @click="open = !open" class="px-3 py-1.5 border border-gray-300 rounded-lg text-sm flex items-center">
-                        <span>选择风险来源</span>
+                        <span>选择风险类别</span>
                         <i class="fas fa-chevron-down ml-2"></i>
                     </button>
                     <div x-show="open" @click.away="open = false" class="absolute z-10 mt-1 w-48 bg-white rounded-lg shadow-lg border border-gray-200">
                         <div class="p-2 space-y-1">
                             <label class="flex items-center">
                                 <input type="checkbox" class="form-checkbox text-blue-600">
-                                <span class="ml-2 text-sm">威胁情报</span>
+                                <span class="ml-2 text-sm">漏洞</span>
                             </label>
                             <label class="flex items-center">
                                 <input type="checkbox" class="form-checkbox text-blue-600">
-                                <span class="ml-2 text-sm">安全扫描</span>
+                                <span class="ml-2 text-sm">事件</span>
                             </label>
                             <label class="flex items-center">
                                 <input type="checkbox" class="form-checkbox text-blue-600">
-                                <span class="ml-2 text-sm">人工上报</span>
+                                <span class="ml-2 text-sm">隐患</span>
                             </label>
                             <label class="flex items-center">
                                 <input type="checkbox" class="form-checkbox text-blue-600">
-                                <span class="ml-2 text-sm">流量分析</span>
-                            </label>
-                            <label class="flex items-center">
-                                <input type="checkbox" class="form-checkbox text-blue-600">
-                                <span class="ml-2 text-sm">IDS告警</span>
+                                <span class="ml-2 text-sm">风险提示</span>
                             </label>
                         </div>
                     </div>
@@ -211,7 +240,7 @@
                         <span>选择标签</span>
                         <i class="fas fa-chevron-down ml-2"></i>
                     </button>
-                    <div x-show="open" @click.away="open = false" class="absolute z-10 mt-1 w-48 bg-white rounded-lg shadow-lg border border-gray-200">
+                    <div x-show="open" @click.away="open = false" class="absolute z-5 mt-1 w-48 bg-white rounded-lg shadow-lg border border-gray-200">
                         <div class="p-2 space-y-1">
                             <label class="flex items-center">
                                 <input type="checkbox" class="form-checkbox text-blue-600">
@@ -309,10 +338,11 @@
                             <i class="fas fa-sort ml-1 text-gray-400"></i>
                         </th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">单位编号</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">关联资产</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">关联资产(IP/URL)</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">资产碰撞</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">风险来源</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">数据来源</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">风险类别</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
                             发现时间
                             <i class="fas fa-sort ml-1 text-gray-400"></i>
@@ -334,7 +364,7 @@
                             0day漏洞
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="px-2 py-1 text-sm rounded-full bg-red-100 text-red-800">高危</span>
+                            <span class="px-2 py-1 text-sm rounded-full bg-red-100 text-red-800">重大</span>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="w-full bg-gray-200 rounded-full h-2">
@@ -345,14 +375,15 @@
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">UNIT-001</td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <button onclick="showAssetsDialog()" class="text-blue-600 hover:text-blue-800">
-                                查看 (3个)
+                                www.example.com/pages/index
                             </button>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <span class="px-2 py-1 text-sm rounded-full bg-red-100 text-red-800">命中</span>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">威胁情报</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">SHCERT</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">平台生成</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-blue-500">SHCERT【2】</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">漏洞</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-03-15 10:30</td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <span class="px-2 py-1 text-xs rounded-full bg-yellow-100 text-yellow-800">处置中</span>
@@ -372,6 +403,7 @@
                                 <button onclick="navigateTo('work-order-detail')" class="text-blue-600 hover:text-blue-800">查看工单</button>
                                 <button onclick="navigateTo('risk-detail')" class="text-blue-600 hover:text-blue-800">详情</button>
                                 <button onclick="openTagDialog()" class="text-blue-600 hover:text-blue-800">打标签</button>
+                                <button class="text-blue-600 hover:text-blue-800">查看原始风险</button>
                             </div>
                         </td>
                     </tr>
@@ -383,7 +415,7 @@
                             SQL注入
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="px-2 py-1 text-sm rounded-full bg-red-100 text-red-800">高危</span>
+                            <span class="px-2 py-1 text-sm rounded-full bg-red-100 text-red-800">重大</span>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="w-full bg-gray-200 rounded-full h-2">
@@ -394,14 +426,15 @@
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">UNIT-002</td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <button onclick="showAssetsDialog()" class="text-blue-600 hover:text-blue-800">
-                                查看 (2个)
+                                10.0.0.1
                             </button>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <span class="px-2 py-1 text-sm rounded-full bg-red-100 text-red-800">命中</span>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">安全扫描</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">第三方上报</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">SHCERT</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">事件</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-03-15 11:45</td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <span class="px-2 py-1 text-xs rounded-full bg-red-100 text-red-800">已研判确认</span>
@@ -421,6 +454,7 @@
                                 <button onclick="navigateTo('work-order-detail')" class="text-blue-600 hover:text-blue-800">查看工单</button>
                                 <button onclick="navigateTo('risk-detail')" class="text-blue-600 hover:text-blue-800">详情</button>
                                 <button onclick="openTagDialog()" class="text-blue-600 hover:text-blue-800">打标签</button>
+                                <button class="text-blue-600 hover:text-blue-800">查看原始风险</button>
                             </div>
                         </td>
                     </tr>
@@ -432,7 +466,7 @@
                             可疑的外连行为
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="px-2 py-1 text-sm rounded-full bg-orange-100 text-orange-800">中危</span>
+                            <span class="px-2 py-1 text-sm rounded-full bg-orange-100 text-orange-800">较大</span>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="w-full bg-gray-200 rounded-full h-2">
@@ -443,14 +477,15 @@
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">-</td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <button onclick="showAssetsDialog()" class="text-blue-600 hover:text-blue-800">
-                                查看 (1个)
+                                www.example.com/page
                             </button>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <span class="px-2 py-1 text-sm rounded-full bg-gray-100 text-gray-800">未命中</span>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">流量分析</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">运营商-移动</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">平台生成</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-blue-500">运营商-移动【3】</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">隐患</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-03-20 15:45</td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <span class="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-800">待研判</span>
@@ -466,6 +501,7 @@
                                 <button onclick="startAnalysis('RISK-004')" class="text-blue-600 hover:text-blue-800">启动研判</button>
                                 <button class="text-blue-600 hover:text-blue-800">详情</button>
                                 <button onclick="openTagDialog()" class="text-blue-600 hover:text-blue-800">打标签</button>
+                                <button class="text-blue-600 hover:text-blue-800">查看原始风险</button>
                             </div>
                         </td>
                     </tr>
@@ -474,10 +510,10 @@
                             RISK-005
                         </td>
                         <td class="sticky left-[100px] z-10 bg-white px-6 py-4 text-sm text-gray-900 border-r max-w-xs truncate">
-                            弱口令风险
+                            <i class="fas fa-flag mr-1 text-red-500"></i>弱口令风险
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="px-2 py-1 text-sm rounded-full bg-yellow-100 text-yellow-800">低危</span>
+                            <span class="px-2 py-1 text-sm rounded-full bg-yellow-100 text-yellow-800">一般</span>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="w-full bg-gray-200 rounded-full h-2">
@@ -488,14 +524,15 @@
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">UNIT-003</td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <button onclick="showAssetsDialog()" class="text-blue-600 hover:text-blue-800">
-                                查看 (2个)
+                                104.25.15.1
                             </button>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <span class="px-2 py-1 text-sm rounded-full bg-red-100 text-red-800">命中</span>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">安全扫描</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">运营商-联通</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">央办下发</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">央办下发</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">风险提示</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-03-21 09:30</td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <span class="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-800">待研判</span>
@@ -511,6 +548,7 @@
                                 <button onclick="startAnalysis('RISK-005')" class="text-blue-600 hover:text-blue-800">启动研判</button>
                                 <button class="text-blue-600 hover:text-blue-800">详情</button>
                                 <button onclick="openTagDialog()" class="text-blue-600 hover:text-blue-800">打标签</button>
+                                <button class="text-blue-600 hover:text-blue-800">查看原始风险</button>
                             </div>
                         </td>
                     </tr>
@@ -522,7 +560,7 @@
                             未授权访问
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="px-2 py-1 text-sm rounded-full bg-red-100 text-red-800">高危</span>
+                            <span class="px-2 py-1 text-sm rounded-full bg-red-100 text-red-800">重大</span>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="w-full bg-gray-200 rounded-full h-2">
@@ -533,14 +571,15 @@
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">UNIT-004</td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <button onclick="showAssetsDialog()" class="text-blue-600 hover:text-blue-800">
-                                查看 (4个)
+                                www.dfed.com/index.php
                             </button>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <span class="px-2 py-1 text-sm rounded-full bg-red-100 text-red-800">命中</span>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">IDS告警</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">央办下发</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">第三方上报</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">支撑单位</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">风险提示</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-03-21 10:15</td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">已研判忽略</span>
@@ -710,7 +749,7 @@
                                 <div class="flex justify-between items-center">
                                     <div>
                                         <h4 class="font-medium">订单管理系统</h4>
-                                        <p class="text-sm text-gray-500 mt-1">192.168.1.101</p>
+                                        <p class="text-sm text-gray-500 mt-1">order.shfk.com/path/to/order</p>
                                     </div>
                                     <span class="px-2 py-1 text-sm rounded-full bg-yellow-100 text-yellow-800">重要系统</span>
                                 </div>
@@ -770,7 +809,7 @@
                     <div class="space-y-2">
                         <div class="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg">
                             <div>
-                                <p class="font-medium">高危风险</p>
+                                <p class="font-medium">特别重大风险</p>
                                 <p class="text-sm text-gray-500">创建人：张三</p>
                             </div>
                             <div class="flex items-center space-x-2">

@@ -4,9 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>风险详情</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="../lib/css/tailwind.min.css" rel="stylesheet">
+    <link href="../lib/fontawesome/css/fontawesome.min.css" rel="stylesheet">
+    <script src="../lib/js/alpine.min.js" defer></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/alpinejs@2.8.2/dist/alpine.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
     <style>
         .risk-matrix {
@@ -44,7 +45,7 @@
                     <div class="flex items-center space-x-6">
                         <div class="flex items-center space-x-2">
                             <span class="text-sm text-gray-500">风险等级：</span>
-                            <span class="px-2 py-1 text-sm rounded-full bg-red-100 text-red-800">高危</span>
+                            <span class="px-2 py-1 text-sm rounded-full bg-red-100 text-red-800">重大</span>
                         </div>
                         <div class="flex items-center space-x-2">
                             <span class="text-sm text-gray-500">优先级评分：</span>
@@ -59,10 +60,28 @@
                         </div>
                         <!-- <div class="risk-matrix ml-4"></div> -->
                     </div>
+                    <div class="flex space-x-2">
+                        <h4 class="text-lg font-bold text-gray-900 mb">
+                            基础信息
+                        </h4>
+                    </div>
                     <div class="flex items-center space-x-6 text-sm text-gray-500">
                         <div>单位编号：UNIT-001</div>
                         <div>风险来源：威胁情报</div>
                         <div>最后更新：2024-03-21 15:45:00</div>
+                    </div>
+                    <div class="flex space-x-2">
+                        <h4 class="text-lg font-bold text-gray-900 mb">
+                            扩展信息
+                        </h4>
+                    </div>
+                    <div class="flex items-center space-x-6 text-sm text-gray-500">
+                        <div>攻击链深度：复杂</div>
+                        <div>数据泄露敏感度：高</div>
+                        <div>数据泄露途径：网络钓鱼</div>
+                        <div>多因素认证绕过风险：高</div>
+                        <div>扩展字段1：xxx</div>
+                        <div>扩展字段2：xxx</div>
                     </div>
                 </div>
                 <div class="flex space-x-2">
