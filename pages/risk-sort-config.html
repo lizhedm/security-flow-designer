@@ -35,7 +35,7 @@
             opacity: 0;
             visibility: hidden;
             transition: opacity 0.5s ease;
-            z-index: 1000;
+            z-index: 1;
             max-width: 300px;
             text-align: center;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
@@ -67,10 +67,10 @@
                 </div>
                 <div class="flex space-x-2">
                     <button class="px-4 py-2 text-sm text-blue-600 hover:bg-blue-50 rounded-lg transition-colors duration-200">
-                        <i class="fas fa-save mr-1"></i> 保存当前配置为新场景
-                    </button>
-                    <button class="px-4 py-2 text-sm text-blue-600 hover:bg-blue-50 rounded-lg transition-colors duration-200">
                         <i class="fas fa-history mr-1"></i> 切换配置场景
+                    </button>
+                    <button onclick="showFilterModal()" class="px-4 py-2 text-sm text-blue-600 hover:bg-blue-50 rounded-lg transition-colors duration-200">
+                        <i class="fas fa-filter mr-1"></i> 全局过滤规则
                     </button>
                 </div>
             </div>
@@ -84,8 +84,8 @@
                     <button class="px-4 py-3 text-sm font-medium text-blue-600 border-b-2 border-blue-600" onclick="switchTab('weight')">
                         权重分配
                     </button>
-                    <button class="px-4 py-3 text-sm font-medium text-gray-500 hover:text-gray-700" onclick="switchTab('filter')">
-                        过滤规则
+                    <button class="px-4 py-3 text-sm font-medium text-gray-500 hover:text-gray-700" onclick="switchTab('static')">
+                        静态评分
                     </button>
                     <button class="px-4 py-3 text-sm font-medium text-gray-500 hover:text-gray-700" onclick="switchTab('aggregate')">
                         聚合参数
@@ -99,78 +99,345 @@
                 </nav>
             </div>
 
+            <!-- 全局过滤规则弹窗 -->
+            <div id="filterModal" class="fixed inset-0 bg-black bg-opacity-50 hidden">
+                <div class="fixed inset-0 flex items-center justify-center">
+                    <div class="bg-white rounded-lg p-6 w-[800px]">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="text-lg font-semibold">全局过滤规则</h3>
+                            <button onclick="closeModal('filterModal')" class="text-gray-400 hover:text-gray-600">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <div class="space-y-6">
+                            <div>
+                                <div class="flex items-center space-x-2 mb-4">
+                                    <label class="text-sm font-medium text-gray-700">必检字段列表</label>
+                                    <i class="fas fa-info-circle info-icon" data-tooltip="勾选需强制校验的字段（如源IP、风险名称、发生时间），缺失则标记为无效"></i>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <label class="flex items-center space-x-2">
+                                        <input type="checkbox" class="rounded text-blue-600">
+                                        <span class="text-sm text-gray-700">源IP</span>
+                                    </label>
+                                    <label class="flex items-center space-x-2">
+                                        <input type="checkbox" class="rounded text-blue-600">
+                                        <span class="text-sm text-gray-700">目标IP</span>
+                                    </label>
+                                    <label class="flex items-center space-x-2">
+                                        <input type="checkbox" class="rounded text-blue-600">
+                                        <span class="text-sm text-gray-700">风险名称</span>
+                                    </label>
+                                    <label class="flex items-center space-x-2">
+                                        <input type="checkbox" class="rounded text-blue-600">
+                                        <span class="text-sm text-gray-700">发生时间</span>
+                                    </label>
+                                    <label class="flex items-center space-x-2">
+                                        <i class="fas fa-plus-circle text-blue-600"></i>
+                                        <span class="text-sm text-blue-600">添加字段</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div>
+                                <div class="flex items-center space-x-2 mb-4">
+                                    <label class="text-sm font-medium text-gray-700">忽略规则</label>
+                                    <i class="fas fa-info-circle info-icon" data-tooltip="支持逻辑运算符（如source_ip IN ('192.168.*', '10.0.0.0/8')）"></i>
+                                </div>
+                                <textarea class="w-full px-3 py-2 border rounded-lg text-sm h-32" placeholder="输入条件表达式"></textarea>
+                            </div>
+
+                            <div>
+                                <div class="flex items-center space-x-2 mb-4">
+                                    <label class="text-sm font-medium text-gray-700">技术关停名单</label>
+                                    <i class="fas fa-info-circle info-icon" data-tooltip="直接过滤指定来源的风险事件"></i>
+                                </div>
+                                <textarea class="w-full px-3 py-2 border rounded-lg text-sm h-32" placeholder="输入IP/CIDR，每行一个"></textarea>
+                            </div>
+                        </div>
+                        <div class="flex justify-end space-x-4 mt-6">
+                            <button onclick="closeModal('filterModal')" class="px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 rounded-lg">
+                                取消
+                            </button>
+                            <button onclick="saveFilterRules()" class="px-4 py-2 text-sm text-white bg-blue-600 hover:bg-blue-700 rounded-lg">
+                                保存
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- 配置内容区域 -->
             <div class="p-6">
                 <!-- 权重分配配置 -->
                 <div id="weight-tab" class="space-y-6">
-                    <div class="space-y-4">
-                        <div class="flex items-center space-x-2">
-                            <label class="text-sm font-medium text-gray-700">静态规则权重</label>
-                            <i class="fas fa-info-circle info-icon" data-tooltip="静态规则的权重占比（如CVSS评分、资产等级等维度）"></i>
-                        </div>
-                        <div class="flex items-center space-x-4">
-                            <input type="range" min="0" max="100" value="70" class="w-2 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer" oninput="updateWeight(this, 'model')">
-                            <span class="text-sm text-gray-600">70%</span>
-                        </div>
+                    <div class="flex justify-between items-center">
+                        <h3 class="text-sm font-medium text-gray-700">权重分配列表</h3>
+                        <button onclick="showAddWeightModal()" class="px-4 py-2 text-sm text-blue-600 hover:bg-blue-50 rounded-lg transition-colors duration-200">
+                            <i class="fas fa-plus mr-1"></i> 新增权重配置
+                        </button>
                     </div>
-
-                    <div class="space-y-4">
-                        <div class="flex items-center space-x-2">
-                            <label class="text-sm font-medium text-gray-700">模型评分权重</label>
-                            <i class="fas fa-info-circle info-icon" data-tooltip="LightGBM模型输出的权重占比（和静态权重总和为100%）"></i>
-                        </div>
-                        <div class="flex items-center space-x-4">
-                            <input type="range" min="0" max="100" value="30" class="w-2 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer" oninput="updateWeight(this, 'static')">
-                            <span class="text-sm text-gray-600">30%</span>
-                        </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead>
+                                <tr class="bg-gray-50">
+                                    <th class="px-2 py-2 text-left text-sm font-medium text-gray-500 w-[200px]">权重分配场景</th>
+                                    <th class="px-2 py-2 text-left text-sm font-medium text-gray-500 w-[300px]">场景定义条件</th>
+                                    <th class="px-2 py-2 text-left text-sm font-medium text-gray-500 w-[200px]">
+                                        静态规则权重占比
+                                        <i class="fas fa-info-circle info-icon" data-tooltip="静态规则的权重占比（如CVSS评分、资产等级等维度）"></i>
+                                    </th>
+                                    <th class="px-2 py-2 text-left text-sm font-medium text-gray-500 w-[200px]">
+                                        模型评分权重占比
+                                        <i class="fas fa-info-circle info-icon" data-tooltip="LightGBM模型输出的权重占比（和静态权重总和为100%）"></i>
+                                    </th>
+                                    <th class="px-2 py-2 text-left text-sm font-medium text-gray-500 w-[100px]">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="weightTableBody">
+                                <tr class="border-b">
+                                    <td class="px-4 py-2 text-sm">已知攻击模式</td>
+                                    <td class="px-4 py-2 text-sm">
+                                        <div class="flex items-center space-x-2">
+                                            <span class="text-gray-600">source_ip IN ('192.168.*', '10.0.0.0/8')</span>
+                                            <button onclick="editSceneCondition(1)" class="text-blue-600 hover:text-blue-800">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                    <td class="px-4 py-2 text-sm">
+                                        <div class="flex items-center space-x-4">
+                                            <input type="range" min="0" max="100" value="70" class="w-2 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer" oninput="updateWeight(this, 'model', 1)">
+                                            <span class="text-sm text-gray-600">70%</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-4 py-2 text-sm">
+                                        <div class="flex items-center space-x-4">
+                                            <input type="range" min="0" max="100" value="30" class="w-2 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer" oninput="updateWeight(this, 'static', 1)">
+                                            <span class="text-sm text-gray-600">30%</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-4 py-2 text-sm">
+                                        <button onclick="deleteWeightRow(1)" class="text-red-600 hover:text-red-800">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr class="border-b">
+                                    <td class="px-4 py-2 text-sm">新型威胁检测</td>
+                                    <td class="px-4 py-2 text-sm">
+                                        <div class="flex items-center space-x-2">
+                                            <span class="text-gray-600">risk_type IN ('新型威胁')</span>
+                                            <button onclick="editSceneCondition(1)" class="text-blue-600 hover:text-blue-800">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                    <td class="px-4 py-2 text-sm">
+                                        <div class="flex items-center space-x-4">
+                                            <input type="range" min="0" max="100" value="30" class="w-2 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer" oninput="updateWeight(this, 'model', 1)">
+                                            <span class="text-sm text-gray-600">30%</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-4 py-2 text-sm">
+                                        <div class="flex items-center space-x-4">
+                                            <input type="range" min="0" max="100" value="70" class="w-2 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer" oninput="updateWeight(this, 'static', 1)">
+                                            <span class="text-sm text-gray-600">70%</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-4 py-2 text-sm">
+                                        <button onclick="deleteWeightRow(1)" class="text-red-600 hover:text-red-800">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr class="border-b">
+                                    <td class="px-4 py-2 text-sm">资产敏感场景</td>
+                                    <td class="px-4 py-2 text-sm">
+                                        <div class="flex items-center space-x-2">
+                                            <span class="text-gray-600">asset_value > 100000 AND asset_type IN ('数据库', '服务器')</span>
+                                            <button onclick="editSceneCondition(1)" class="text-blue-600 hover:text-blue-800">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                    <td class="px-4 py-2 text-sm">
+                                        <div class="flex items-center space-x-4">
+                                            <input type="range" min="0" max="100" value="80" class="w-2 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer" oninput="updateWeight(this, 'model', 1)">
+                                            <span class="text-sm text-gray-600">80%</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-4 py-2 text-sm">
+                                        <div class="flex items-center space-x-4">
+                                            <input type="range" min="0" max="100" value="20" class="w-2 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer" oninput="updateWeight(this, 'static', 1)">
+                                            <span class="text-sm text-gray-600">20%</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-4 py-2 text-sm">
+                                        <button onclick="deleteWeightRow(1)" class="text-red-600 hover:text-red-800">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr class="border-b">
+                                    <td class="px-4 py-2 text-sm">
+                                        默认场景
+                                        <i class="fas fa-info-circle info-icon" data-tooltip="都不匹配使用默认"></i>
+                                    </td>
+                                    <td class="px-4 py-2 text-sm">
+                                        <div class="flex items-center space-x-2">
+                                            <span class="text-gray-600">无</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-4 py-2 text-sm">
+                                        <div class="flex items-center space-x-4">
+                                            <input type="range" min="0" max="100" value="80" class="w-2 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer" oninput="updateWeight(this, 'model', 1)">
+                                            <span class="text-sm text-gray-600">70%</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-4 py-2 text-sm">
+                                        <div class="flex items-center space-x-4">
+                                            <input type="range" min="0" max="100" value="20" class="w-2 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer" oninput="updateWeight(this, 'static', 1)">
+                                            <span class="text-sm text-gray-600">30%</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-4 py-2 text-sm">
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
 
-                <!-- 过滤规则配置 -->
-                <div id="filter-tab" class="space-y-6 hidden">
-                    <div class="space-y-4">
-                        <div class="flex items-center space-x-2">
-                            <label class="text-sm font-medium text-gray-700">必检字段列表</label>
-                            <i class="fas fa-info-circle info-icon" data-tooltip="勾选需强制校验的字段（如源IP、风险名称、发生时间），缺失则标记为无效"></i>
-                        </div>
-                        <div class="grid grid-cols-2 gap-4">
-                            <label class="flex items-center space-x-2">
-                                <input type="checkbox" class="rounded text-blue-600">
-                                <span class="text-sm text-gray-700">源IP</span>
-                            </label>
-                            <label class="flex items-center space-x-2">
-                                <input type="checkbox" class="rounded text-blue-600">
-                                <span class="text-sm text-gray-700">目标IP</span>
-                            </label>
-                            <label class="flex items-center space-x-2">
-                                <input type="checkbox" class="rounded text-blue-600">
-                                <span class="text-sm text-gray-700">风险名称</span>
-                            </label>
-                            <label class="flex items-center space-x-2">
-                                <input type="checkbox" class="rounded text-blue-600">
-                                <span class="text-sm text-gray-700">发生时间</span>
-                            </label>
-                            <label class="flex items-center space-x-2">
-                                <i class="fas fa-plus-circle text-blue-600"></i>
-                                <span class="text-sm text-blue-600">添加字段</span>
-                            </label>
-                        </div>
+                <!-- 静态评分配置 -->
+                <div id="static-tab" class="space-y-6 hidden">
+                    <div class="flex justify-between items-center">
+                        <h3 class="text-sm font-medium text-gray-700">静态评分列表</h3>
+                        <button onclick="showAddStaticModal()" class="px-4 py-2 text-sm text-blue-600 hover:bg-blue-50 rounded-lg transition-colors duration-200">
+                            <i class="fas fa-plus mr-1"></i> 新增静态评分
+                        </button>
                     </div>
-
-                    <div class="space-y-4">
-                        <div class="flex items-center space-x-2">
-                            <label class="text-sm font-medium text-gray-700">忽略规则</label>
-                            <i class="fas fa-info-circle info-icon" data-tooltip="支持逻辑运算符（如source_ip IN ('192.168.*', '10.0.0.0/8')）"></i>
-                        </div>
-                        <textarea class="w-full px-3 py-2 border rounded-lg text-sm h-32" placeholder="输入条件表达式"></textarea>
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead>
+                                <tr class="bg-gray-50">
+                                    <th class="px-2 py-2 text-left text-sm font-medium text-gray-500 w-[200px]">评分场景</th>
+                                    <th class="px-2 py-2 text-left text-sm font-medium text-gray-500 w-[300px]">场景定义条件</th>
+                                    <th class="px-2 py-2 text-left text-sm font-medium text-gray-500 w-[200px]">
+                                        静态规则权重
+                                        <i class="fas fa-info-circle info-icon" data-tooltip="静态规则的权重占比（如CVSS评分、资产等级等维度）"></i>
+                                    </th>
+                                    <th class="px-2 py-2 text-left text-sm font-medium text-gray-500 w-[100px]">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="staticTableBody">
+                                <tr class="border-b">
+                                    <td class="px-2 py-2 text-sm">已知攻击模式</td>
+                                    <td class="px-2 py-2 text-sm">
+                                        <div class="flex items-center space-x-2">
+                                            <span class="text-gray-600">source_ip IN ('192.168.*', '10.0.0.0/8')</span>
+                                            <button onclick="editStaticSceneCondition(1)" class="text-blue-600 hover:text-blue-800">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                    <td class="px-2 py-2 text-sm">
+                                        <div class="flex items-center space-x-4">
+                                            <input type="range" min="0" max="100" value="70" class="w-2 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer" oninput="updateStaticWeight(this, 1)">
+                                            <span class="text-sm text-gray-600">70%</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-2 py-2 text-sm">
+                                        <button onclick="deleteStaticRow(1)" class="text-red-600 hover:text-red-800">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr class="border-b">
+                                    <td class="px-2 py-2 text-sm">
+                                        默认场景
+                                        <i class="fas fa-info-circle info-icon" data-tooltip="场景都不匹配时使用默认"></i>
+                                    </td>
+                                    <td class="px-2 py-2 text-sm">
+                                        <div class="flex items-center space-x-2">
+                                            <span class="text-gray-600">无</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-2 py-2 text-sm">
+                                        <div class="flex items-center space-x-4">
+                                            <input type="range" min="0" max="100" value="70" class="w-2 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer" oninput="updateWeight(this, 'model', 1)">
+                                            <span class="text-sm text-gray-600">70%</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-2 py-2 text-sm">
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
+                </div>
 
-                    <div class="space-y-4">
-                        <div class="flex items-center space-x-2">
-                            <label class="text-sm font-medium text-gray-700">技术关停名单</label>
-                            <i class="fas fa-info-circle info-icon" data-tooltip="直接过滤指定来源的风险事件"></i>
+                <!-- 新增静态评分弹窗 -->
+                <div id="addStaticModal" class="fixed inset-0 bg-black bg-opacity-50 hidden">
+                    <div class="fixed inset-0 flex items-center justify-center">
+                        <div class="bg-white rounded-lg p-6 w-[500px]">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="text-lg font-semibold">新增静态评分</h3>
+                                <button onclick="closeModal('addStaticModal')" class="text-gray-400 hover:text-gray-600">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">场景名称</label>
+                                    <input type="text" id="newStaticSceneName" class="w-full px-3 py-2 border rounded-lg text-sm" placeholder="请输入场景名称">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">场景定义条件</label>
+                                    <div class="space-y-2">
+                                        <div class="flex items-center space-x-2">
+                                            <select id="newStaticConditionField" class="px-3 py-2 border rounded-lg text-sm">
+                                                <option value="source_ip">源IP</option>
+                                                <option value="target_ip">目标IP</option>
+                                                <option value="risk_type">风险类型</option>
+                                                <option value="risk_level">风险等级</option>
+                                                <option value="asset_value">资产价值</option>
+                                            </select>
+                                            <select id="newStaticConditionOperator" class="px-3 py-2 border rounded-lg text-sm">
+                                                <option value="IN">包含于</option>
+                                                <option value="NOT_IN">不包含于</option>
+                                                <option value=">">大于</option>
+                                                <option value="<">小于</option>
+                                                <option value="=">等于</option>
+                                                <option value="!=">不等于</option>
+                                            </select>
+                                            <input type="text" id="newStaticConditionValue" class="px-3 py-2 border rounded-lg text-sm" placeholder="输入条件值">
+                                            <button onclick="addStaticCondition()" class="px-3 py-2 text-sm text-blue-600 hover:bg-blue-50 rounded-lg">
+                                                <i class="fas fa-plus"></i>
+                                            </button>
+                                        </div>
+                                        <div id="staticConditionsList" class="space-y-2">
+                                            <!-- 条件列表将通过JavaScript动态生成 -->
+                                        </div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">静态规则权重</label>
+                                    <div class="flex items-center space-x-4">
+                                        <input type="range" id="newStaticWeight" min="0" max="100" value="70" class="w-2 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer" oninput="updateNewStaticWeight(this)">
+                                        <span class="text-sm text-gray-600">70%</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex justify-end space-x-4 mt-6">
+                                <button onclick="closeModal('addStaticModal')" class="px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 rounded-lg">
+                                    取消
+                                </button>
+                                <button onclick="addStaticRow()" class="px-4 py-2 text-sm text-white bg-blue-600 hover:bg-blue-700 rounded-lg">
+                                    确定
+                                </button>
+                            </div>
                         </div>
-                        <textarea class="w-full px-3 py-2 border rounded-lg text-sm h-32" placeholder="输入IP/CIDR，每行一个"></textarea>
                     </div>
                 </div>
 
@@ -301,11 +568,14 @@
 
                 <!-- 操作按钮 -->
                 <div class="flex justify-end space-x-4 mt-6">
+                    <button class="px-4 py-2 text-sm text-blue-600 hover:bg-blue-50 rounded-lg transition-colors duration-200">
+                        <i class="fas fa-check mr-1"></i> 保存配置
+                    </button>
                     <button class="px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 rounded-lg transition-colors duration-200">
                         <i class="fas fa-undo mr-1"></i> 重置默认值
                     </button>
                     <button class="px-4 py-2 text-sm text-blue-600 hover:bg-blue-50 rounded-lg transition-colors duration-200">
-                        <i class="fas fa-save mr-1"></i> 保存配置
+                        <i class="fas fa-save mr-1"></i> 保存为新场景
                     </button>
                     <button class="px-4 py-2 text-sm text-green-600 hover:bg-green-50 rounded-lg transition-colors duration-200">
                         <i class="fas fa-play mr-1"></i> 测试配置
@@ -570,9 +840,10 @@
         }
 
         // 权重联动调整
-        function updateWeight(input, target) {
+        function updateWeight(input, target, rowId) {
             const value = parseInt(input.value);
-            const targetInput = document.querySelector(`input[oninput="updateWeight(this, '${target}')"]`);
+            const row = input.closest('tr');
+            const targetInput = row.querySelector(`input[oninput="updateWeight(this, '${target}', ${rowId})"]`);
             const targetValue = 100 - value;
             targetInput.value = targetValue;
             targetInput.nextElementSibling.textContent = targetValue + '%';
@@ -698,13 +969,265 @@
         // 对比新旧排序
         function compareSorting(riskId) {
             // TODO: 实现新旧排序对比逻辑
-            alert('正在开发中...');
+            // alert('正在开发中...');
         }
 
         // 为按钮添加点击事件
         document.querySelector('button:has(i.fa-save)').onclick = () => showModal('saveTemplateModal');
         document.querySelector('button:has(i.fa-history)').onclick = () => showModal('loadTemplateModal');
         document.querySelector('button:has(i.fa-play)').onclick = testConfig;
+
+        // 显示新增权重配置弹窗
+        function showAddWeightModal() {
+            showModal('addWeightModal');
+        }
+
+        // 更新新增弹窗中的权重
+        function updateNewWeight(input, target) {
+            const value = parseInt(input.value);
+            const targetInput = document.getElementById(target === 'static' ? 'newModelWeight' : 'newStaticWeight');
+            const targetValue = 100 - value;
+            targetInput.value = targetValue;
+            targetInput.nextElementSibling.textContent = targetValue + '%';
+            input.nextElementSibling.textContent = value + '%';
+        }
+
+        // 添加条件
+        function addCondition() {
+            const field = document.getElementById('newConditionField').value;
+            const operator = document.getElementById('newConditionOperator').value;
+            const value = document.getElementById('newConditionValue').value;
+
+            if (!value) {
+                alert('请输入条件值');
+                return;
+            }
+
+            const conditionsList = document.getElementById('conditionsList');
+            const conditionId = Date.now();
+            const conditionDiv = document.createElement('div');
+            conditionDiv.className = 'flex items-center space-x-2 bg-gray-50 p-2 rounded-lg';
+            conditionDiv.innerHTML = `
+                <span class="text-sm text-gray-600">${field} ${operator} ${value}</span>
+                <button onclick="removeCondition(${conditionId})" class="text-red-600 hover:text-red-800">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            conditionDiv.id = `condition-${conditionId}`;
+            conditionsList.appendChild(conditionDiv);
+
+            // 清空输入框
+            document.getElementById('newConditionValue').value = '';
+        }
+
+        // 删除条件
+        function removeCondition(conditionId) {
+            const condition = document.getElementById(`condition-${conditionId}`);
+            condition.remove();
+        }
+
+        // 编辑场景条件
+        function editSceneCondition(rowId) {
+            // TODO: 实现编辑场景条件的逻辑
+            alert('正在开发中...');
+        }
+
+        // 修改添加新的权重配置行函数
+        function addWeightRow() {
+            const sceneName = document.getElementById('newSceneName').value;
+            const staticWeight = document.getElementById('newStaticWeight').value;
+            const modelWeight = document.getElementById('newModelWeight').value;
+            const conditions = Array.from(document.getElementById('conditionsList').children)
+                .map(div => div.querySelector('span').textContent)
+                .join(' AND ');
+
+            if (!sceneName) {
+                alert('请输入场景名称');
+                return;
+            }
+
+            const tbody = document.getElementById('weightTableBody');
+            const newRow = document.createElement('tr');
+            newRow.className = 'border-b';
+            const rowId = tbody.children.length + 1;
+
+            newRow.innerHTML = `
+                <td class="px-4 py-2 text-sm">${sceneName}</td>
+                <td class="px-4 py-2 text-sm">
+                    <div class="flex items-center space-x-2">
+                        <span class="text-gray-600">${conditions || '无'}</span>
+                        <button onclick="editSceneCondition(${rowId})" class="text-blue-600 hover:text-blue-800">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                    </div>
+                </td>
+                <td class="px-4 py-2 text-sm">
+                    <div class="flex items-center space-x-4">
+                        <input type="range" min="0" max="100" value="${staticWeight}" class="w-2 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer" oninput="updateWeight(this, 'model', ${rowId})">
+                        <span class="text-sm text-gray-600">${staticWeight}%</span>
+                    </div>
+                </td>
+                <td class="px-4 py-2 text-sm">
+                    <div class="flex items-center space-x-4">
+                        <input type="range" min="0" max="100" value="${modelWeight}" class="w-2 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer" oninput="updateWeight(this, 'static', ${rowId})">
+                        <span class="text-sm text-gray-600">${modelWeight}%</span>
+                    </div>
+                </td>
+                <td class="px-4 py-2 text-sm">
+                    <button onclick="deleteWeightRow(${rowId})" class="text-red-600 hover:text-red-800">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
+            `;
+
+            tbody.appendChild(newRow);
+            closeModal('addWeightModal');
+
+            // 重置表单
+            document.getElementById('newSceneName').value = '';
+            document.getElementById('newStaticWeight').value = 70;
+            document.getElementById('newModelWeight').value = 30;
+            document.getElementById('newStaticWeight').nextElementSibling.textContent = '70%';
+            document.getElementById('newModelWeight').nextElementSibling.textContent = '30%';
+            document.getElementById('conditionsList').innerHTML = '';
+        }
+
+        // 删除权重配置行
+        function deleteWeightRow(rowId) {
+            if (confirm('确定要删除这条权重配置吗？')) {
+                const tbody = document.getElementById('weightTableBody');
+                const row = tbody.children[rowId - 1];
+                row.remove();
+            }
+        }
+
+        // 显示全局过滤规则弹窗
+        function showFilterModal() {
+            showModal('filterModal');
+        }
+
+        // 保存过滤规则
+        function saveFilterRules() {
+            // TODO: 实现保存过滤规则的逻辑
+            closeModal('filterModal');
+        }
+
+        // 显示新增静态评分弹窗
+        function showAddStaticModal() {
+            showModal('addStaticModal');
+        }
+
+        // 更新静态评分权重
+        function updateStaticWeight(input, rowId) {
+            const value = parseInt(input.value);
+            input.nextElementSibling.textContent = value + '%';
+        }
+
+        // 更新新增静态评分弹窗中的权重
+        function updateNewStaticWeight(input) {
+            const value = parseInt(input.value);
+            input.nextElementSibling.textContent = value + '%';
+        }
+
+        // 添加静态评分条件
+        function addStaticCondition() {
+            const field = document.getElementById('newStaticConditionField').value;
+            const operator = document.getElementById('newStaticConditionOperator').value;
+            const value = document.getElementById('newStaticConditionValue').value;
+
+            if (!value) {
+                alert('请输入条件值');
+                return;
+            }
+
+            const conditionsList = document.getElementById('staticConditionsList');
+            const conditionId = Date.now();
+            const conditionDiv = document.createElement('div');
+            conditionDiv.className = 'flex items-center space-x-2 bg-gray-50 p-2 rounded-lg';
+            conditionDiv.innerHTML = `
+                <span class="text-sm text-gray-600">${field} ${operator} ${value}</span>
+                <button onclick="removeStaticCondition(${conditionId})" class="text-red-600 hover:text-red-800">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            conditionDiv.id = `static-condition-${conditionId}`;
+            conditionsList.appendChild(conditionDiv);
+
+            // 清空输入框
+            document.getElementById('newStaticConditionValue').value = '';
+        }
+
+        // 删除静态评分条件
+        function removeStaticCondition(conditionId) {
+            const condition = document.getElementById(`static-condition-${conditionId}`);
+            condition.remove();
+        }
+
+        // 编辑静态评分场景条件
+        function editStaticSceneCondition(rowId) {
+            // TODO: 实现编辑静态评分场景条件的逻辑
+            alert('正在开发中...');
+        }
+
+        // 添加新的静态评分行
+        function addStaticRow() {
+            const sceneName = document.getElementById('newStaticSceneName').value;
+            const staticWeight = document.getElementById('newStaticWeight').value;
+            const conditions = Array.from(document.getElementById('staticConditionsList').children)
+                .map(div => div.querySelector('span').textContent)
+                .join(' AND ');
+
+            if (!sceneName) {
+                alert('请输入场景名称');
+                return;
+            }
+
+            const tbody = document.getElementById('staticTableBody');
+            const newRow = document.createElement('tr');
+            newRow.className = 'border-b';
+            const rowId = tbody.children.length + 1;
+
+            newRow.innerHTML = `
+                <td class="px-2 py-2 text-sm">${sceneName}</td>
+                <td class="px-2 py-2 text-sm">
+                    <div class="flex items-center space-x-2">
+                        <span class="text-gray-600">${conditions || '无'}</span>
+                        <button onclick="editStaticSceneCondition(${rowId})" class="text-blue-600 hover:text-blue-800">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                    </div>
+                </td>
+                <td class="px-2 py-2 text-sm">
+                    <div class="flex items-center space-x-4">
+                        <input type="range" min="0" max="100" value="${staticWeight}" class="w-2 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer" oninput="updateStaticWeight(this, ${rowId})">
+                        <span class="text-sm text-gray-600">${staticWeight}%</span>
+                    </div>
+                </td>
+                <td class="px-2 py-2 text-sm">
+                    <button onclick="deleteStaticRow(${rowId})" class="text-red-600 hover:text-red-800">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
+            `;
+
+            tbody.appendChild(newRow);
+            closeModal('addStaticModal');
+
+            // 重置表单
+            document.getElementById('newStaticSceneName').value = '';
+            document.getElementById('newStaticWeight').value = 70;
+            document.getElementById('newStaticWeight').nextElementSibling.textContent = '70%';
+            document.getElementById('staticConditionsList').innerHTML = '';
+        }
+
+        // 删除静态评分行
+        function deleteStaticRow(rowId) {
+            if (confirm('确定要删除这条静态评分配置吗？')) {
+                const tbody = document.getElementById('staticTableBody');
+                const row = tbody.children[rowId - 1];
+                row.remove();
+            }
+        }
     </script>
 </body>
 </html> 
